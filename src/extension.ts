@@ -1,11 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ProgressLocation, workspace, window, commands, ExtensionContext } from 'vscode';
+import { workspace, window, commands, ExtensionContext, DebugConsoleMode, ProgressLocation } from 'vscode';
+import * as Docker from 'dockerode';
 import { posix } from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { ContainerInspectInfo } from 'dockerode';
 
-async function extractConfig() {
+async function getConfig() {
 	if (!workspace.workspaceFolders) {
 		return window.showInformationMessage('No folder or workspace opened');
 	}
@@ -26,69 +26,123 @@ async function extractConfig() {
 	return config;
 }
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export async function activate(context: ExtensionContext) {
+function getFormattedName(name: string): string {
+	return name[0] === '/' ? name.substring(1) : name;
+}
 
+function getContainerLabel(containerInfo: ContainerInspectInfo): string {
+	const containerName = getFormattedName(containerInfo.Name);
+	const containerImage = containerInfo.Config.Image;
+	return `${containerImage} (${containerName})`;
+}
 
-	const { containers }: { containers: Array<string> } = await extractConfig();
+async function startAll() {
 
+	const progressOptions = { location: ProgressLocation.Notification, title: 'Starting All Containers' };
 
-	const asyncExec = promisify(exec);
+	window.withProgress(progressOptions, (async (progress) => {
 
-	for (const container of containers) {
-		const { stderr, stdout }: any = await asyncExec(`docker start ${container}`)
-			.catch((err) => {
-				if (err) {
-					console.log('error: ' + err);
-					return window.showErrorMessage(`Failed To Start Docker Container ${container}`);
-				}
-			});
+		const { containers }: { containers: Array<string> } = await getConfig();
 
-		if (stderr) {
-			console.log('stderr: ' + stderr);
-			return window.showErrorMessage(`Failed To Start Docker Container ${container}, error: ${stderr}`);
+		const containersLength = containers.length;
+
+		progress.report({ message: `0/${containersLength}` });
+
+		const docker = new Docker();
+
+		for (let i = 0; i < containersLength; i++) {
+
+			progress.report({ message: `${i + 1}/${containersLength}` });
+			const containerId = containers[i];
+			const container = docker.getContainer(containerId);
+
+			if (!container) {
+				window.showErrorMessage(`No Container With Given Container Id ${containerId} found`);
+				continue;
+			}
+
+			const containerInfo = await container.inspect();
+			const containerLabel = getContainerLabel(containerInfo);
+
+			const { State: { Running } } = containerInfo;
+
+			if (Running) {
+				window.showInformationMessage(`Container ${containerLabel} Already Started`);
+				continue;
+			}
+
+			await container.start();
+			window.showInformationMessage(`Successfully Started ${containerLabel}`);
+
 		}
-		console.log('success: ' + stdout);
-		const { stdout: containerInfo }: any = await asyncExec(`docker inspect --format='{{.Config.Image}}({{.Name}})' ${container}`);
+	}));
+}
 
-		window.showInformationMessage(`Successfully Started The Container ${containerInfo}`);
+async function stopAll() {
 
-	}
+	const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping All Containers' };
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "docker-run" is now active!');
+	window.withProgress(progressOptions, (async (progress) => {
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = commands.registerCommand('docker-run.start', () => {
-		// The code you place here will be executed every time your command is executed
+		const { containers }: { containers: Array<string> } = await getConfig();
 
-		// Display a message box to the user
-		window.showInformationMessage('docker-run extension started');
+		const containersLength = containers.length;
+
+		progress.report({ message: `0/${containersLength}` });
+
+		const docker = new Docker();
+
+		for (let i = 0; i < containersLength; i++) {
+
+			progress.report({ message: `${i + 1}/${containersLength}` });
+			const containerId = containers[i];
+			const container = docker.getContainer(containerId);
+
+			if (!container) {
+				window.showErrorMessage(`No Container With Given Container Id ${containerId} found`);
+				continue;
+			}
+
+			const containerInfo = await container.inspect();
+			const containerLabel = getContainerLabel(containerInfo);
+
+			const { State: { Running } } = containerInfo;
+
+			if (!Running) {
+				window.showInformationMessage(`Container ${containerLabel} Already Stopped`);
+				continue;
+			}
+
+			await container.stop();
+			window.showInformationMessage(`Successfully Stopped ${containerLabel}`);
+
+		}
+	}));
+}
+
+function registerStartAll(context: ExtensionContext) {
+	let disposable = commands.registerCommand('docker-run.start:all', async () => {
+		await startAll();
 	});
-
 	context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
-export async function deactivate() {
-	const { containers }: { containers: Array<string> } = await extractConfig();
-
-	containers.forEach((container) => {
-		exec(`docker stop ${container}`, (err, stdout, stderr) => {
-			if (err) {
-				console.log('error: ' + err);
-				return window.showErrorMessage(`Failed to stop docker container ${container}`);
-			}
-			if (stderr) {
-				console.log('stderr: ' + stderr);
-				return window.showErrorMessage(`Failed to stop docker container ${container}, error: ${stderr}`);
-			}
-			console.log('success: ' + stdout);
-			window.showInformationMessage(`Successfully stopped the container ${container}`);
-		});
+function registerStopAll(context: ExtensionContext) {
+	let disposableStopAll = commands.registerCommand('docker-run.stop:all', async () => {
+		await stopAll();
 	});
+	context.subscriptions.push(disposableStopAll);
+}
+
+export async function activate(context: ExtensionContext) {
+
+	await startAll();
+
+	registerStartAll(context);
+
+	registerStopAll(context);
+}
+
+export async function deactivate() {
+	await stopAll();
 }
