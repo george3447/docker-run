@@ -1,6 +1,6 @@
-# docker-run README
+# Docker Run
 
-This is the README for your extension "docker-run". After writing up a brief description, we recommend including the following sections.
+Extension for automatically start docker containers that defined in the dockerrc file.
 
 ## Features
 

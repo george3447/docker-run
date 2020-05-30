@@ -1,8 +1,9 @@
 {
   "name": "docker-run",
-  "displayName": "docker-run",
+  "displayName": "Docker Run",
   "description": "This extension will help you to automatically start docker containers",
   "version": "0.0.1",
+  "publisher": "george3447",
   "engines": {
     "vscode": "^1.45.0"
   },
@@ -10,11 +11,15 @@
     "Other"
   ],
   "activationEvents": [
-    "workspaceContains:**/.dockerrc"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "docker-run.add",
+        "title": "Docker Run: Add"
+      },
       {
         "command": "docker-run.start:all",
         "title": "Docker Run: Start All"
@@ -22,6 +27,14 @@
       {
         "command": "docker-run.stop:all",
         "title": "Docker Run: Stop All"
+      },
+      {
+        "command": "docker-run.start",
+        "title": "Docker Run: Start"
+      },
+      {
+        "command": "docker-run.stop",
+        "title": "Docker Run: Stop"
       }
     ]
   },
@@ -49,5 +62,16 @@
   },
   "dependencies": {
     "dockerode": "^3.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/george3447/docker-run"
+  },
+  "author": {
+    "name": "Georgekutty Antony"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/george3447/docker-run/issues"
   }
 }
