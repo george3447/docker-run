@@ -2,6 +2,7 @@ import { ProgressLocation, window, commands } from "vscode";
 
 import { getContainersList, ContainerList } from "../common/docker-utils";
 import { ext } from "../core/ext-variables";
+import { handleError } from "../common/error-utils";
 
 export const disposableStartAll = commands.registerCommand('docker-run.start:all', async () => {
     const progressOptions = { location: ProgressLocation.Notification, title: 'Starting All Containers' };
@@ -9,7 +10,7 @@ export const disposableStartAll = commands.registerCommand('docker-run.start:all
     window.withProgress(progressOptions, (async (progress) => {
 
         const containerList = await getContainersList(true).catch((error: Error) => {
-            window.showWarningMessage(error.message);
+            handleError(error);
             return [] as ContainerList;
         });
 
