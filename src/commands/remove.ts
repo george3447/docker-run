@@ -1,13 +1,13 @@
 import { commands, window } from "vscode";
 
-import { getContainersList } from "../common/docker-utils";
+import { getContainersList, ContainerList, extractContainerIds } from "../common/docker-utils";
 import { writeConfig } from "../common/config-utils";
-import { stopContainersByLabels } from '../common/stop-container';
+import { ext } from "../core/ext-variables";
 
 export const disposableRemove = commands.registerCommand('docker-run.remove', async () => {
     const containerList = await getContainersList(true).catch((error: Error) => {
         window.showWarningMessage(error.message);
-        return [] as Array<string>;
+        return [] as ContainerList;
     });
 
     if (!containerList.length) {
@@ -20,8 +20,9 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
     });
 
     if (selection && selection.length > 0) {
-        await writeConfig(containerList.filter(containerListItem => !selection.includes(containerListItem)));
-        await stopContainersByLabels(selection);
+        const containerIds = extractContainerIds(containerList.filter(containerListItem => !selection.includes(containerListItem)));
+        await writeConfig(containerIds);
+        await ext.stopOperation.operateContainers(selection);
     }
 
 });

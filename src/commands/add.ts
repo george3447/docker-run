@@ -1,8 +1,8 @@
 import { commands, window } from "vscode";
 
-import { getAllContainersList, getContainersList } from "../common/docker-utils";
+import { getAllContainersList, getContainersList, ContainerList, extractContainerIds } from "../common/docker-utils";
 import { writeConfig } from "../common/config-utils";
-import { startContainersByLabels } from '../common/start-container';
+import { ext } from "../core/ext-variables";
 
 export const disposableAdd = commands.registerCommand('docker-run.add', async (createConfigFile?: boolean) => {
     const availableContainerList = await getAllContainersList();
@@ -19,17 +19,20 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
         });
 
         if (selection && selection.length > 0) {
-            await writeConfig(selection);
-            await startContainersByLabels(selection);
+            const containerIds = extractContainerIds(selection);
+            await writeConfig(containerIds);
+            await ext.startOperation.operateContainers(selection);
         }
 
     } else {
         const containerList = await getContainersList(true).catch((error: Error) => {
             window.showWarningMessage(error.message);
-            return [] as Array<string>;
+            return [] as ContainerList;
         });
 
-        const newContainers = availableContainerList.filter(availableContainer => !containerList.includes(availableContainer));
+        const newContainers = availableContainerList.filter(availableContainer =>
+            !containerList.map(container => container.containerId)
+                .includes(availableContainer.containerId));
 
         if (!newContainers.length) {
             return window.showInformationMessage(`All Available Containers Are Already Added`);
@@ -41,8 +44,9 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
         });
 
         if (selection && selection.length > 0) {
-            await writeConfig([...containerList, ...selection]);
-            await startContainersByLabels(selection);
+            const containerIds = extractContainerIds([...containerList, ...selection]);
+            await writeConfig(containerIds);
+            await ext.startOperation.operateContainers(selection);
         }
     }
 });

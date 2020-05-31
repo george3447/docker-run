@@ -1,7 +1,7 @@
 import { commands, window } from "vscode";
 
 import { getContainersList } from "../common/docker-utils";
-import { startContainersByLabels } from "../common/start-container";
+import { ext } from "../core/ext-variables";
 
 export const disposableStart = commands.registerCommand('docker-run.start', async () => {
 
@@ -19,7 +19,7 @@ export const disposableStart = commands.registerCommand('docker-run.start', asyn
 
         if (selection && selection.length > 0) {
 
-            await startContainersByLabels(selection);
+            await ext.startOperation.operateContainers(selection);
         }
     }
 });

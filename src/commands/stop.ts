@@ -1,7 +1,7 @@
 import { commands, window } from "vscode";
 
 import { getContainersList } from "../common/docker-utils";
-import { stopContainersByLabels } from "../common/stop-container";
+import { ext } from "../core/ext-variables";
 
 export const disposableStop = commands.registerCommand('docker-run.stop', async () => {
 
@@ -20,7 +20,7 @@ export const disposableStop = commands.registerCommand('docker-run.stop', async 
 
         if (selection && selection.length > 0) {
 
-            await stopContainersByLabels(selection);
+            await ext.stopOperation.operateContainers(selection);
         }
     }
 });

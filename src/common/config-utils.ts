@@ -36,15 +36,12 @@ export async function getConfig() {
     return config;
 }
 
-export async function writeConfig(containerLabels: Array<string>) {
+export async function writeConfig(containerIds: Array<string>) {
     if (!workspace.workspaceFolders) {
         return window.showInformationMessage('No folder or workspace opened');
     }
 
-    const containerIds = containerLabels.map(containerLabel => containerLabel.split(ID_SEPARATOR)[ID_SEPARATOR_ID_INDEX]);
-    const containers = containerIds;
-
-    const writeStr = JSON.stringify({ containers });
+    const writeStr = JSON.stringify({ containers: containerIds });
     const writeData = Buffer.from(writeStr, 'utf8');
 
     const folderUri = workspace.workspaceFolders[0].uri;

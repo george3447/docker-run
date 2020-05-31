@@ -1,19 +1,19 @@
 import { ProgressLocation, window, commands } from "vscode";
 
-import { getConfig } from "../common/config-utils";
-import { stopContainers } from "../common/stop-container";
+import { getContainersList, ContainerList } from "../common/docker-utils";
+import { ext } from "../core/ext-variables";
 
 export const disposableStopAll = commands.registerCommand('docker-run.stop:all', async () => {
     const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping All Containers' };
 
     window.withProgress(progressOptions, (async (progress) => {
 
-        const { containers }: { containers: Array<string> } = await getConfig().catch((error: Error) => {
+        const containerList = await getContainersList(true).catch((error: Error) => {
             window.showWarningMessage(error.message);
-            return;
+            return [] as ContainerList;
         });
 
-        await stopContainers(containers, progress);
+        await ext.stopOperation.operateContainersWithProgress(containerList, progress);
 
     }));
 });

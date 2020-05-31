@@ -1,6 +1,6 @@
 import { ExtensionContext, commands } from 'vscode';
 
-import { initDockerode } from './core/core-utils';
+import { initDockerode, initContainerOperations } from './core/core-utils';
 import { isConfigAvailable } from './common/config-utils';
 import { disposableAdd } from './commands/add';
 import { disposableRemove } from './commands/remove';
@@ -12,6 +12,8 @@ import { disposableStop } from './commands/stop';
 export async function activate(context: ExtensionContext) {
 
 	initDockerode();
+
+	initContainerOperations();
 
 	context.subscriptions.push
 		(

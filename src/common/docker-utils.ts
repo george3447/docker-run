@@ -1,19 +1,26 @@
+import { QuickPickItem } from "vscode";
 import { ContainerInspectInfo } from "dockerode";
 
-import { ID_SEPARATOR } from "./constants";
 import { getConfig } from './config-utils';
 import { ext } from '../core/ext-variables';
-import { window } from "vscode";
 
-async function getContainerLabels(containers: string[], isAll: boolean, isRunning?: boolean) {
+export interface ContainerListItem extends QuickPickItem {
+    containerId: string;
+}
+
+export type ContainerList = Array<ContainerListItem>;
+
+async function getContainerListByContainerIdsAndStatus(containers: string[], isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containersList = [];
     for (let i = 0; i < containers.length; i++) {
+
         const containerId = containers[i];
         const container = ext.dockerode.getContainer(containerId);
         const containerInfo = await container.inspect();
+
         if (isAll || containerInfo.State.Running === isRunning) {
-            const containerLabel = getContainerLabel(containerInfo);
-            containersList.push(`${containerLabel}${ID_SEPARATOR}${containerId}`);
+            const label = getContainerLabel(containerInfo);
+            containersList.push({ label, containerId });
         }
     }
     return containersList;
@@ -29,17 +36,21 @@ export function getContainerLabel(containerInfo: ContainerInspectInfo): string {
     return `${containerImage} (${containerName})`;
 }
 
-export async function getContainersList(isAll: boolean, isRunning?: boolean) {
+export async function getContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const { containers }: { containers: Array<string> } = await getConfig().catch((error: Error) => {
         throw error;
     });
-    return await getContainerLabels(containers, isAll, isRunning);
+    return await getContainerListByContainerIdsAndStatus(containers, isAll, isRunning);
 }
 
-export async function getAllContainersList() {
+export async function getAllContainersList(): Promise<ContainerList> {
     const containers = await ext.dockerode.listContainers({ all: true });
     if (!containers) {
         return [];
     }
-    return getContainerLabels(containers.map(container => container.Id.substring(0, 12)), true);
+    return getContainerListByContainerIdsAndStatus(containers.map(container => container.Id.substring(0, 12)), true);
+}
+
+export function extractContainerIds(containerList: ContainerList) {
+    return containerList.map(containerListItem => containerListItem.containerId);
 }
