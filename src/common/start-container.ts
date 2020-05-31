@@ -1,8 +1,26 @@
-import { window, Progress } from "vscode";
-import { Container } from "dockerode";
+import { window, Progress, ProgressLocation } from "vscode";
 
 import { getContainerLabel } from "./docker-utils";
 import { ext } from "../core/ext-variables";
+import { ID_SEPARATOR, ID_SEPARATOR_ID_INDEX } from "./constants";
+
+export async function startContainersByLabels(selection: string[]) {
+    if (selection.length === 1) {
+        const [containerName, containerId] = selection[0].split(ID_SEPARATOR);
+        const progressOptions = { location: ProgressLocation.Notification, title: `Starting Container ${containerName}` };
+        window.withProgress(progressOptions, (async () => {
+            await startContainer(containerId);
+        }));
+    }
+    else {
+        const containerIds = selection.map(selectedContainer => selectedContainer.split(ID_SEPARATOR)[ID_SEPARATOR_ID_INDEX]);
+        const progressOptions = { location: ProgressLocation.Notification, title: `Starting Selected Containers` };
+        window.withProgress(progressOptions, (async (progress) => {
+            await startContainers(containerIds, progress);
+        }));
+    }
+}
+
 
 export async function startContainers(containers: Array<string>, progress: Progress<{
     message?: string | undefined;

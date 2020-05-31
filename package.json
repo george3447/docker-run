@@ -2,7 +2,7 @@
   "name": "docker-run",
   "displayName": "Docker Run",
   "description": "This extension will help you to automatically start docker containers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "george3447",
   "engines": {
     "vscode": "^1.45.0"
@@ -18,23 +18,27 @@
     "commands": [
       {
         "command": "docker-run.add",
-        "title": "Docker Run: Add"
+        "title": "Docker Run: Add Container To Workspace"
+      },
+      {
+        "command": "docker-run.remove",
+        "title": "Docker Run: Remove Container From Workspace"
       },
       {
         "command": "docker-run.start:all",
-        "title": "Docker Run: Start All"
+        "title": "Docker Run: Start All Containers From Workspace"
       },
       {
         "command": "docker-run.stop:all",
-        "title": "Docker Run: Stop All"
+        "title": "Docker Run: Stop All Containers From Workspace"
       },
       {
         "command": "docker-run.start",
-        "title": "Docker Run: Start"
+        "title": "Docker Run: Start Container From Workspace"
       },
       {
         "command": "docker-run.stop",
-        "title": "Docker Run: Stop"
+        "title": "Docker Run: Stop Containers From Workspace"
       }
     ]
   },

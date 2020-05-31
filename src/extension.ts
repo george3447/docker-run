@@ -1,35 +1,35 @@
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, commands } from 'vscode';
 
 import { initDockerode } from './core/core-utils';
 import { isConfigAvailable } from './common/config-utils';
-import { registerStartAll, startAll } from './commands/start-all';
-import { registerStopAll, stopAll } from './commands/stop-all';
-import { registerStop } from './commands/stop';
-import { registerStart } from './commands/start';
-import { add } from './common/add';
-import { registerAdd } from './commands/add';
-
+import { disposableAdd } from './commands/add';
+import { disposableRemove } from './commands/remove';
+import { disposableStartAll } from './commands/start-all';
+import { disposableStopAll } from './commands/stop-all';
+import { disposableStart } from './commands/start';
+import { disposableStop } from './commands/stop';
 
 export async function activate(context: ExtensionContext) {
 
 	initDockerode();
 
-	registerAdd(context);
-
-	registerStart(context);
-
-	registerStop(context);
-
-	registerStartAll(context);
-
-	registerStopAll(context);
+	context.subscriptions.push
+		(
+			disposableAdd,
+			disposableRemove,
+			disposableStartAll,
+			disposableStopAll,
+			disposableStart,
+			disposableStop
+		);
 
 	if (!isConfigAvailable()) {
-		await add(true);
+		await commands.executeCommand('docker-run.add', true);
+	} else {
+		await commands.executeCommand('docker-run.start:all');
 	}
-	await startAll();
 }
 
 export async function deactivate() {
-	await stopAll();
+	await commands.executeCommand('docker-run.stop:all');
 }

@@ -1,10 +1,9 @@
-import { ProgressLocation, window, commands, ExtensionContext } from "vscode";
+import { ProgressLocation, window, commands } from "vscode";
 
 import { getConfig } from "../common/config-utils";
 import { stopContainers } from "../common/stop-container";
 
-export async function stopAll() {
-
+export const disposableStopAll = commands.registerCommand('docker-run.stop:all', async () => {
     const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping All Containers' };
 
     window.withProgress(progressOptions, (async (progress) => {
@@ -17,11 +16,4 @@ export async function stopAll() {
         await stopContainers(containers, progress);
 
     }));
-}
-
-export function registerStopAll(context: ExtensionContext) {
-    let disposableStopAll = commands.registerCommand('docker-run.stop:all', async () => {
-        await stopAll();
-    });
-    context.subscriptions.push(disposableStopAll);
-}
+});

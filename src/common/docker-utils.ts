@@ -29,11 +29,11 @@ export function getContainerLabel(containerInfo: ContainerInspectInfo): string {
     return `${containerImage} (${containerName})`;
 }
 
-export async function getContainersList(isRunning: boolean, ) {
+export async function getContainersList(isAll: boolean, isRunning?: boolean) {
     const { containers }: { containers: Array<string> } = await getConfig().catch((error: Error) => {
         throw error;
     });
-    return await getContainerLabels(containers, false, isRunning);
+    return await getContainerLabels(containers, isAll, isRunning);
 }
 
 export async function getAllContainersList() {

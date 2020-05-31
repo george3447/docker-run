@@ -1,7 +1,26 @@
-import { Progress, window } from "vscode";
+import { Progress, window, ProgressLocation } from "vscode";
 
 import { getContainerLabel } from "./docker-utils";
 import { ext } from "../core/ext-variables";
+import { ID_SEPARATOR, ID_SEPARATOR_ID_INDEX } from "./constants";
+
+export async function stopContainersByLabels(selection: string[]) {
+    if (selection.length === 1) {
+        const [containerName, containerId] = selection[0].split(ID_SEPARATOR);
+        const progressOptions = { location: ProgressLocation.Notification, title: `Stopping Container ${containerName}` };
+        window.withProgress(progressOptions, (async () => {
+            await stopContainer(containerId);
+        }));
+    }
+    else {
+        const containerIds = selection.map(selectedContainer => selectedContainer.split(ID_SEPARATOR)[ID_SEPARATOR_ID_INDEX]);
+        const progressOptions = { location: ProgressLocation.Notification, title: `Stopping Selected Containers` };
+        window.withProgress(progressOptions, (async (progress) => {
+            await stopContainers(containerIds, progress);
+        }));
+    }
+}
+
 
 export async function stopContainers(containers: Array<string>, progress: Progress<{
     message?: string | undefined;
