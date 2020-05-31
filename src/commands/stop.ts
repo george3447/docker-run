@@ -2,11 +2,12 @@ import { commands, window } from "vscode";
 
 import { getContainersList } from "../common/docker-utils";
 import { ext } from "../core/ext-variables";
+import { handleError } from "../common/error-utils";
 
 export const disposableStop = commands.registerCommand('docker-run.stop', async () => {
 
     const runningContainerList = await getContainersList(false, true).catch((error: Error) => {
-        window.showWarningMessage(error.message);
+        handleError(error);
         return;
     });
 

@@ -3,6 +3,7 @@ import { commands, window } from "vscode";
 import { getAllContainersList, getContainersList, ContainerList, extractContainerIds } from "../common/docker-utils";
 import { writeConfig } from "../common/config-utils";
 import { ext } from "../core/ext-variables";
+import { handleError } from "../common/error-utils";
 
 export const disposableAdd = commands.registerCommand('docker-run.add', async (createConfigFile?: boolean) => {
     const availableContainerList = await getAllContainersList();
@@ -26,7 +27,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
 
     } else {
         const containerList = await getContainersList(true).catch((error: Error) => {
-            window.showWarningMessage(error.message);
+            handleError(error);
             return [] as ContainerList;
         });
 

@@ -3,6 +3,7 @@ import { posix } from "path";
 import { existsSync } from "fs";
 
 import { DEFAULT_FILE_NAME, CONFIGURATION_KEY } from "./constants";
+import { DockerRcNotFoundError } from "./error-utils";
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
@@ -34,7 +35,7 @@ export async function getConfig() {
     const fileUri = getFileUri();
 
     if (!fileUri) {
-        throw new Error(`No ${DEFAULT_FILE_NAME} provided`);
+        throw new DockerRcNotFoundError(`No ${DEFAULT_FILE_NAME} provided`);
     }
 
     const readData = await workspace.fs.readFile(fileUri);
