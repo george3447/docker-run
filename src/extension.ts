@@ -1,6 +1,6 @@
 import { ExtensionContext, commands } from 'vscode';
 
-import { initDockerode, initContainerOperations } from './core/core-utils';
+import { initDockerode, initContainerOperations, initAutoAdd } from './core/core-utils';
 import { isConfigAvailable } from './common/config-utils';
 import { disposableAdd } from './commands/add';
 import { disposableRemove } from './commands/remove';
@@ -8,6 +8,7 @@ import { disposableStartAll } from './commands/start-all';
 import { disposableStopAll } from './commands/stop-all';
 import { disposableStart } from './commands/start';
 import { disposableStop } from './commands/stop';
+import { handleError } from './common/error-utils';
 
 export async function activate(context: ExtensionContext) {
 
@@ -26,7 +27,7 @@ export async function activate(context: ExtensionContext) {
 		);
 
 	if (!isConfigAvailable()) {
-		await commands.executeCommand('docker-run.add', true);
+		await initAutoAdd().catch(handleError);
 	} else {
 		await commands.executeCommand('docker-run.start:all');
 	}

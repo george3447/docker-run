@@ -2,7 +2,7 @@ import { workspace, window, languages, commands, WorkspaceEdit, TextEdit } from 
 import { posix } from "path";
 import { existsSync } from "fs";
 
-import { DEFAULT_FILE_NAME, ID_SEPARATOR, ID_SEPARATOR_ID_INDEX } from "./constants";
+import { DEFAULT_FILE_NAME, CONFIGURATION_KEY } from "./constants";
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
@@ -17,6 +17,16 @@ function getFileUri() {
 
 export function isConfigAvailable() {
     return !!getFileUri();
+}
+
+export function isSkipped(): boolean {
+    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION_KEY);
+    const configInfo = workspaceConfiguration.inspect('skip');
+    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
+        return true;
+    }
+    return false;
+
 }
 
 export async function getConfig() {

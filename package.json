@@ -2,7 +2,8 @@
   "name": "docker-run",
   "displayName": "Docker Run",
   "description": "This extension will help you to automatically start docker containers",
-  "version": "0.0.2",
+  "version": "0.0.4",
+  "icon": "images/icon.png",
   "publisher": "george3447",
   "engines": {
     "vscode": "^1.45.0"
@@ -15,6 +16,16 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Docker Run",
+      "properties": {
+        "DockerRun.skip": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip Automatic Generation Of '.dockerrc'"
+        }
+      }
+    },
     "commands": [
       {
         "command": "docker-run.add",
