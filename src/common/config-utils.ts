@@ -2,7 +2,7 @@ import { workspace, window, languages, commands, WorkspaceEdit, TextEdit } from 
 import { posix } from "path";
 import { existsSync } from "fs";
 
-import { DEFAULT_FILE_NAME, CONFIGURATION_KEY } from "./constants";
+import { DEFAULT_FILE_NAME, CONFIGURATION } from "./constants";
 import { DockerRcNotFoundError } from "./error-utils";
 
 function getFileUri() {
@@ -20,9 +20,19 @@ export function isConfigAvailable() {
     return !!getFileUri();
 }
 
-export function isSkipped(): boolean {
-    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION_KEY);
-    const configInfo = workspaceConfiguration.inspect('skip');
+export function isAutoGenerateConfigDisabled(): boolean {
+    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
+    const configInfo = workspaceConfiguration.inspect(CONFIGURATION.DISABLE_AUTO_GENERATE_CONFIG);
+    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
+        return true;
+    }
+    return false;
+
+}
+
+export function isAutoStopNonRelatedDisabled(): boolean {
+    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
+    const configInfo = workspaceConfiguration.inspect(CONFIGURATION.DISABLE_AUTO_STOP_NON_RELATED);
     if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
         return true;
     }

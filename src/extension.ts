@@ -1,6 +1,6 @@
 import { ExtensionContext, commands } from 'vscode';
 
-import { initDockerode, initContainerOperations, initAutoAdd } from './core/core-utils';
+import { initDockerode, initContainerOperations, initAutoAdd, initAutoStart } from './core/core-utils';
 import { isConfigAvailable } from './common/config-utils';
 import { disposableAdd } from './commands/add';
 import { disposableRemove } from './commands/remove';
@@ -9,6 +9,7 @@ import { disposableStopAll } from './commands/stop-all';
 import { disposableStart } from './commands/start';
 import { disposableStop } from './commands/stop';
 import { handleError } from './common/error-utils';
+import { disposableStopNonRelated } from './commands/stop-non-related';
 
 export async function activate(context: ExtensionContext) {
 
@@ -22,6 +23,7 @@ export async function activate(context: ExtensionContext) {
 			disposableRemove,
 			disposableStartAll,
 			disposableStopAll,
+			disposableStopNonRelated,
 			disposableStart,
 			disposableStop
 		);
@@ -29,7 +31,7 @@ export async function activate(context: ExtensionContext) {
 	if (!isConfigAvailable()) {
 		await initAutoAdd().catch(handleError);
 	} else {
-		await commands.executeCommand('docker-run.start:all');
+		await initAutoStart().catch(handleError);
 	}
 }
 
