@@ -43,12 +43,12 @@ export async function getContainersList(isAll: boolean, isRunning?: boolean): Pr
     return await getContainerListByContainerIdsAndStatus(containers, isAll, isRunning);
 }
 
-export async function getAllContainersList(): Promise<ContainerList> {
+export async function getAllContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containers = await ext.dockerode.listContainers({ all: true });
     if (!containers) {
         return [];
     }
-    return getContainerListByContainerIdsAndStatus(containers.map(container => container.Id.substring(0, 12)), true);
+    return getContainerListByContainerIdsAndStatus(containers.map(container => container.Id.substring(0, 12)), isAll, isRunning);
 }
 
 export function extractContainerIds(containerList: ContainerList) {

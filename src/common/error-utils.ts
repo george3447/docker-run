@@ -1,9 +1,16 @@
 import { DEFAULT_FILE_NAME } from "./constants";
 
-export class SkippedError extends Error {
+export class AutoGenerateConfigDisabledError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = 'Skipped Auto Generation Error';
+        this.name = 'Disabled Auto Generate Config Error';
+    }
+}
+
+export class AutoStopNonRelatedDisabledError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'Disabled Auto Stop Non Related Error';
     }
 }
 

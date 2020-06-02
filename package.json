@@ -1,9 +1,13 @@
 {
   "name": "docker-run",
   "displayName": "Docker Run",
-  "description": "This extension will help you to automatically start docker containers",
-  "version": "0.0.8",
+  "description": "Start your docker containers automatically for each workspace",
+  "version": "0.1.1",
   "icon": "images/icon.png",
+  "author": {
+    "name": "Georgekutty Antony",
+    "email": "mail@georgekuttyantony.com"
+  },
   "publisher": "george3447",
   "engines": {
     "vscode": "^1.45.0"
@@ -11,12 +15,21 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/george3447/docker-run"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/george3447/docker-run/issues"
+  },
   "activationEvents": [
     "workspaceContains:*",
     "onCommand:docker-run.add",
     "onCommand:docker-run.remove",
     "onCommand:docker-run.start:all",
     "onCommand:docker-run.stop:all",
+    "onCommand:docker-run.stop:non-related",
     "onCommand:docker-run.start",
     "onCommand:docker-run.stop"
   ],
@@ -25,10 +38,15 @@
     "configuration": {
       "title": "Docker Run",
       "properties": {
-        "DockerRun.skip": {
+        "DockerRun.DisableAutoGenerateConfig": {
           "type": "boolean",
           "default": false,
-          "description": "Skip Automatic Generation Of '.dockerrc'"
+          "description": "Disable automatic generation of '.dockerrc' config file"
+        },
+        "DockerRun.DisableAutoStopNonRelated": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable automatic stopping of Non Related Containers"
         }
       }
     },
@@ -48,6 +66,10 @@
       {
         "command": "docker-run.stop:all",
         "title": "Docker Run: Stop All Containers"
+      },
+      {
+        "command": "docker-run.stop:non-related",
+        "title": "Docker Run: Stop Non Related Containers"
       },
       {
         "command": "docker-run.start",
@@ -87,16 +109,5 @@
   },
   "dependencies": {
     "dockerode": "^3.2.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/george3447/docker-run"
-  },
-  "author": {
-    "name": "Georgekutty Antony"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/george3447/docker-run/issues"
   }
 }
