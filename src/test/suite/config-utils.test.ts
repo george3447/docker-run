@@ -16,22 +16,38 @@ function sleep(ms: number): Promise<void> {
 	});
 }
 
+const testConfigFilePath = path.resolve(__dirname, `../../../src/test/workspace/${DEFAULT_FILE_NAME}`);
+
 const getFileURI = () => {
-	const testConfigFilePath = path.resolve(__dirname, `../../../src/test/workspace/${DEFAULT_FILE_NAME}`);
 	return Uri.file(testConfigFilePath);
+};
+
+const clearDockerrc = async () => {
+	const fileUri = getFileURI();
+	await workspace.fs.delete(fileUri);
 };
 
 const mockContainerIds = ["asd123asd123", "123asd123asd123asd"];
 
-suite('Extension Test Suite', async () => {
+suite('Config Utils Tests', async () => {
 
-	// suiteSetup(async () => {
-	// 	const testFolderPath = path.resolve(__dirname, '../../../', 'test-workspace');
-	// 	const uri = Uri.file(testFolderPath);	
-	// });
+	suiteSetup(async () => {
+		//const testFolderPath = path.resolve(__dirname, '../../../', 'test-workspace');
+		//const uri = Uri.file(testFolderPath);	
+		//console.log('=== START ===');
+	});
+
+	teardown(async () => {
+		await writeConfig([]);
+		//console.log('fired tear down end each');
+	});
+
 
 	suiteTeardown(async () => {
-		await writeConfig([]);
+		await clearDockerrc();
+		const writeData = Buffer.from('', 'utf8');
+		await workspace.fs.writeFile(getFileURI(), writeData);
+		//console.log('=== END ===');
 	});
 
 	window.showInformationMessage('Start all tests.');
@@ -42,33 +58,29 @@ suite('Extension Test Suite', async () => {
 	});
 
 	test("Should get no dockerrc found error", async () => {
-		let error;
-		const fileUri = getFileURI();
-		await workspace.fs.delete(fileUri);
-		await getConfig().catch(e => error = e);
+		await clearDockerrc()
+		const error = await getConfig().catch(error => error);
 		assert.deepEqual(error, new DockerrcNotFoundError());
 	});
 
 	test("Should get empty config error", async () => {
-		let error;
 		await writeConfig([]);
-		await getConfig().catch(e => error = e);
+		const error = await getConfig().catch(error => error);
+		await clearDockerrc();
 		assert.deepEqual(error, new EmptyConfigError());
 	});
 
 	test("Should write configuration", async () => {
 		await writeConfig(mockContainerIds);
 		const currentConfig = await getConfig();
-		const fileUri = getFileURI();
-		await workspace.fs.delete(fileUri);
+		await clearDockerrc();
 		assert.deepStrictEqual(mockContainerIds, currentConfig);
 	});
 
 	test("Should get config", async () => {
 		await writeConfig(mockContainerIds);
 		const currentConfig = await getConfig();
-		const fileUri = getFileURI();
-		await workspace.fs.delete(fileUri);
+		await clearDockerrc();
 		assert.deepStrictEqual(mockContainerIds, currentConfig);
 	});
 
