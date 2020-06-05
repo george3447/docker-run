@@ -37,7 +37,7 @@ export function getContainerLabel(containerInfo: ContainerInspectInfo): string {
 }
 
 export async function getContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
-    const { containers }: { containers: Array<string> } = await getConfig().catch((error: Error) => {
+    const containers: Array<string> = await getConfig().catch((error: Error) => {
         throw error;
     });
     return await getContainerListByContainerIdsAndStatus(containers, isAll, isRunning);

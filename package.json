@@ -82,7 +82,7 @@
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./",
+    "test-compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
     "pretest": "npm run compile && npm run lint",
     "vscode:prepublish": "webpack --mode=production",

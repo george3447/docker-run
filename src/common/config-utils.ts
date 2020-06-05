@@ -3,7 +3,7 @@ import { posix } from "path";
 import { existsSync } from "fs";
 
 import { DEFAULT_FILE_NAME, CONFIGURATION } from "./constants";
-import { DockerRcNotFoundError } from "./error-utils";
+import { DockerrcNotFoundError, EmptyConfigError } from "./error-utils";
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
@@ -45,16 +45,16 @@ export async function getConfig() {
     const fileUri = getFileUri();
 
     if (!fileUri) {
-        throw new DockerRcNotFoundError(`No ${DEFAULT_FILE_NAME} provided`);
+        throw new DockerrcNotFoundError();
     }
 
     const readData = await workspace.fs.readFile(fileUri);
     const config = JSON.parse(Buffer.from(readData).toString('utf8'));
 
-    if (!config || !config.containers) {
-        return window.showInformationMessage('No container names provided');
+    if (!config || !config.containers || !config.containers.length) {
+        throw new EmptyConfigError();
     }
-    return config;
+    return config.containers;
 }
 
 export async function writeConfig(containerIds: Array<string>) {
