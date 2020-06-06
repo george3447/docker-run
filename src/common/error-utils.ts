@@ -24,14 +24,33 @@ export class SelectedNoError extends Error {
 export class DockerrcNotFoundError extends Error {
     constructor(message: string = `No ${DEFAULT_FILE_NAME} provided`) {
         super(message);
-        this.name = `Config File Not Found` ;
+        this.name = `Config File Not Found`;
     }
 }
 
 export class EmptyConfigError extends Error {
-    constructor(message = 'Configuration Array Is Empty'){
+
+    constructor(message: string, private fileName: string) {
         super(message);
-        this.name = 'Empty Config';
+        this.setFileName(fileName);
+    }
+
+    setFileName(fileName: string) {
+        this.name = `Empty Config [${this.fileName}]`;
+    }
+}
+
+export class EmptyConfigArrayError extends EmptyConfigError {
+
+    constructor(message = 'Configuration Array Is Empty', fileName = "Config Util") {
+        super(message, fileName);
+    }
+}
+
+export class EmptyConfigFileError extends EmptyConfigError {
+
+    constructor(message = 'Configuration File Is Empty', fileName = "Config Util") {
+        super(message, fileName);
     }
 }
 

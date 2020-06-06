@@ -3,7 +3,7 @@ import { posix } from "path";
 import { existsSync } from "fs";
 
 import { DEFAULT_FILE_NAME, CONFIGURATION } from "./constants";
-import { DockerrcNotFoundError, EmptyConfigError } from "./error-utils";
+import { DockerrcNotFoundError, EmptyConfigError, EmptyConfigFileError, EmptyConfigArrayError } from "./error-utils";
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
@@ -49,10 +49,14 @@ export async function getConfig() {
     }
 
     const readData = await workspace.fs.readFile(fileUri);
-    const config = JSON.parse(Buffer.from(readData).toString('utf8'));
+    const stringData = Buffer.from(readData).toString('utf8');
+    if (!stringData) {
+        throw new EmptyConfigFileError();
+    }
+    const config = JSON.parse(stringData);
 
     if (!config || !config.containers || !config.containers.length) {
-        throw new EmptyConfigError();
+        throw new EmptyConfigArrayError();
     }
     return config.containers;
 }

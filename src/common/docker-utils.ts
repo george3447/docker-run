@@ -3,6 +3,7 @@ import { ContainerInspectInfo } from "dockerode";
 
 import { getConfig } from './config-utils';
 import { ext } from '../core/ext-variables';
+import { EmptyConfigError } from "./error-utils";
 
 export interface ContainerListItem extends QuickPickItem {
     containerId: string;
@@ -37,7 +38,8 @@ export function getContainerLabel(containerInfo: ContainerInspectInfo): string {
 }
 
 export async function getContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
-    const containers: Array<string> = await getConfig().catch((error: Error) => {
+    const containers: Array<string> = await getConfig().catch((error: EmptyConfigError) => {
+        error.setFileName("Docker Utils");
         throw error;
     });
     return await getContainerListByContainerIdsAndStatus(containers, isAll, isRunning);

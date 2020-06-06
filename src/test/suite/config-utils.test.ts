@@ -6,7 +6,7 @@ import path = require('path');
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { commands, window, extensions, Uri, workspace } from 'vscode';
 import { writeConfig, getConfig } from '../../common/config-utils';
-import { DockerrcNotFoundError, EmptyConfigError } from '../../common/error-utils';
+import { DockerrcNotFoundError, EmptyConfigError, EmptyConfigArrayError, EmptyConfigFileError } from '../../common/error-utils';
 import { DEFAULT_FILE_NAME } from '../../common/constants';
 // import * as myExtension from '../../extension';
 
@@ -27,6 +27,11 @@ const clearDockerrc = async () => {
 	await workspace.fs.delete(fileUri);
 };
 
+const setEmptyDockerrc = async () => {
+	const writeData = Buffer.from('', 'utf8');
+	await workspace.fs.writeFile(getFileURI(), writeData);
+};
+
 const mockContainerIds = ["asd123asd123", "123asd123asd123asd"];
 
 suite('Config Utils Tests', async () => {
@@ -45,8 +50,7 @@ suite('Config Utils Tests', async () => {
 
 	suiteTeardown(async () => {
 		await clearDockerrc();
-		const writeData = Buffer.from('', 'utf8');
-		await workspace.fs.writeFile(getFileURI(), writeData);
+		await setEmptyDockerrc();
 		//console.log('=== END ===');
 	});
 
@@ -58,16 +62,23 @@ suite('Config Utils Tests', async () => {
 	});
 
 	test("Should get no dockerrc found error", async () => {
-		await clearDockerrc()
+		await clearDockerrc();
 		const error = await getConfig().catch(error => error);
 		assert.deepEqual(error, new DockerrcNotFoundError());
 	});
 
-	test("Should get empty config error", async () => {
+	test("Should get empty config file error", async () => {
+		await clearDockerrc();
+		await setEmptyDockerrc();
+		const error = await getConfig().catch(error => error);
+		assert.deepEqual(error, new EmptyConfigFileError());
+	});
+
+	test("Should get empty config array error", async () => {
 		await writeConfig([]);
 		const error = await getConfig().catch(error => error);
 		await clearDockerrc();
-		assert.deepEqual(error, new EmptyConfigError());
+		assert.deepEqual(error, new EmptyConfigArrayError());
 	});
 
 	test("Should write configuration", async () => {
