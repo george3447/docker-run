@@ -1,5 +1,5 @@
 import Dockerode = require("dockerode");
-import { ContainerOperation } from "../common/container-operation";
+import { ContainerOperation } from "../common/container";
 
 export namespace ext {
     export let dockerode: Dockerode;

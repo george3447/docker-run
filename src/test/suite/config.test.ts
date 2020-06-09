@@ -1,20 +1,10 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import path = require('path');
-import { existsSync, mkdirSync, unlinkSync } from 'fs';
-import { commands, window, extensions, Uri, workspace } from 'vscode';
-import { writeConfig, getConfig } from '../../common/config-utils';
-import { DockerrcNotFoundError, EmptyConfigError, EmptyConfigArrayError, EmptyConfigFileError } from '../../common/error-utils';
-import { DEFAULT_FILE_NAME } from '../../common/constants';
-// import * as myExtension from '../../extension';
+import { window, extensions, Uri, workspace } from 'vscode';
 
-function sleep(ms: number): Promise<void> {
-	return new Promise(resolve => {
-		setTimeout(resolve, ms);
-	});
-}
+import { writeConfig, getConfig } from '../../common/config';
+import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../common/error';
+import { DEFAULT_FILE_NAME } from '../../common/constants';
 
 const testConfigFilePath = path.resolve(__dirname, `../../../src/test/workspace/${DEFAULT_FILE_NAME}`);
 
@@ -34,24 +24,16 @@ const setEmptyDockerrc = async () => {
 
 const mockContainerIds = ["asd123asd123", "123asd123asd123asd"];
 
-suite('Config Utils Tests', async () => {
-
-	suiteSetup(async () => {
-		//const testFolderPath = path.resolve(__dirname, '../../../', 'test-workspace');
-		//const uri = Uri.file(testFolderPath);	
-		//console.log('=== START ===');
-	});
+suite('Config Tests', async () => {
 
 	teardown(async () => {
 		await writeConfig([]);
-		//console.log('fired tear down end each');
 	});
 
 
 	suiteTeardown(async () => {
 		await clearDockerrc();
 		await setEmptyDockerrc();
-		//console.log('=== END ===');
 	});
 
 	window.showInformationMessage('Start all tests.');

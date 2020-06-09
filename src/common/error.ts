@@ -1,5 +1,12 @@
 import { DEFAULT_FILE_NAME } from "./constants";
 
+export class NoFolderOrWorkspaceOpenedError extends Error {
+    constructor(message: string = "No folder or workspace opened") {
+        super(message);
+        this.name = 'No Folder Or Workspace Opened Error';
+    }
+}
+
 export class AutoGenerateConfigDisabledError extends Error {
     constructor(message: string) {
         super(message);

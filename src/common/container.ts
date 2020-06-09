@@ -1,6 +1,6 @@
 import { Progress, window, ProgressLocation } from "vscode";
 
-import { ContainerList, ContainerListItem } from "./docker-utils";
+import { ContainerList, ContainerListItem } from "./docker";
 import { ext } from "../core/ext-variables";
 
 export enum OperationType {

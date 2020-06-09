@@ -2,13 +2,12 @@ import { workspace, window, languages, commands, WorkspaceEdit, TextEdit } from 
 import { posix } from "path";
 import { existsSync } from "fs";
 
-import { DEFAULT_FILE_NAME, CONFIGURATION } from "./constants";
-import { DockerrcNotFoundError, EmptyConfigError, EmptyConfigFileError, EmptyConfigArrayError } from "./error-utils";
+import { DEFAULT_FILE_NAME, } from "./constants";
+import { DockerrcNotFoundError, EmptyConfigFileError, EmptyConfigArrayError, NoFolderOrWorkspaceOpenedError } from "./error";
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
-        window.showInformationMessage('No folder or workspace opened');
-        return;
+        throw new NoFolderOrWorkspaceOpenedError();
     }
 
     const folderUri = workspace.workspaceFolders[0].uri;
@@ -18,26 +17,6 @@ function getFileUri() {
 
 export function isConfigAvailable() {
     return !!getFileUri();
-}
-
-export function isAutoGenerateConfigDisabled(): boolean {
-    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
-    const configInfo = workspaceConfiguration.inspect(CONFIGURATION.DISABLE_AUTO_GENERATE_CONFIG);
-    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
-        return true;
-    }
-    return false;
-
-}
-
-export function isAutoStopNonRelatedDisabled(): boolean {
-    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
-    const configInfo = workspaceConfiguration.inspect(CONFIGURATION.DISABLE_AUTO_STOP_NON_RELATED);
-    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
-        return true;
-    }
-    return false;
-
 }
 
 export async function getConfig() {

@@ -1,8 +1,8 @@
 import { ProgressLocation, window, commands } from "vscode";
 
-import { getContainersList, ContainerList, getAllContainersList } from "../common/docker-utils";
+import { getContainersList, ContainerList, getAllContainersList } from "../common/docker";
 import { ext } from "../core/ext-variables";
-import { handleError } from "../common/error-utils";
+import { handleError } from "../common/error";
 
 export const disposableStopNonRelated = commands.registerCommand('docker-run.stop:non-related', async () => {
     const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping Non Related Containers' };

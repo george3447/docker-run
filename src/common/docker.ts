@@ -1,9 +1,9 @@
 import { QuickPickItem } from "vscode";
 import { ContainerInspectInfo } from "dockerode";
 
-import { getConfig } from './config-utils';
+import { getConfig } from './config';
 import { ext } from '../core/ext-variables';
-import { EmptyConfigError } from "./error-utils";
+import { EmptyConfigError } from "./error";
 
 export interface ContainerListItem extends QuickPickItem {
     containerId: string;

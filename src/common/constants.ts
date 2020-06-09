@@ -1,5 +1,5 @@
 import { AutoAddList } from './models';
-import { OperationConfig, OperationType } from './container-operation';
+import { OperationConfig, OperationType } from './container';
 
 export const DEFAULT_FILE_NAME = '.dockerrc';
 export const CONFIGURATION_KEY = 'DockerRun';
