@@ -1,6 +1,6 @@
 import { ProgressLocation, window, commands } from "vscode";
 
-import { getContainersList, ContainerList } from "../common/docker";
+import { getContainersList, ContainerList } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 

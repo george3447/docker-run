@@ -1,29 +1,25 @@
 import { Progress, window, ProgressLocation } from "vscode";
+import { Container } from "dockerode";
 
-import { ContainerList, ContainerListItem } from "./docker";
-import { ext } from "../core/ext-variables";
-
-export enum OperationType {
-    START = 'start',
-    STOP = 'stop'
-}
+import { ContainerList, ContainerListItem } from "../../common/list";
+import { ext } from "../ext-variables";
 
 export interface OperationConfig {
-    type: OperationType,
     message: {
         progress: string;
-        status: string;
         result: string;
     }
 }
 
-export class ContainerOperation {
+export abstract class Operation {
 
     private operationConfig: OperationConfig;
 
     constructor(operationConfig: OperationConfig) {
         this.operationConfig = operationConfig;
     }
+
+    async abstract operate(container: Container, label?: string): Promise<void>;
 
     async operateContainers(selection: ContainerList) {
         const { message: { progress } } = this.operationConfig;
@@ -61,7 +57,7 @@ export class ContainerOperation {
 
     async operateContainer(containerListItem: ContainerListItem) {
 
-        const { type, message } = this.operationConfig;
+        const { message } = this.operationConfig;
         const { containerId, label } = containerListItem;
         const container = ext.dockerode.getContainer(containerId);
 
@@ -70,15 +66,7 @@ export class ContainerOperation {
             return;
         }
 
-        const containerInfo = await container.inspect();
-        const { State: { Running } } = containerInfo;
-
-        if (Running === (type === OperationType.START)) {
-            window.showInformationMessage(`Container ${label} Already ${message.status}`);
-            return;
-        }
-
-        await container[type]();
+        await this.operate(container, label);
         window.showInformationMessage(`Successfully ${message.result} ${label}`);
     }
 }

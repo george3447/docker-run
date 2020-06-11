@@ -1,5 +1,4 @@
 import { AutoAddList } from './models';
-import { OperationConfig, OperationType } from './container';
 
 export const DEFAULT_FILE_NAME = '.dockerrc';
 export const CONFIGURATION_KEY = 'DockerRun';
@@ -22,30 +21,3 @@ export const autoAddList: AutoAddList = [
     { label: 'Never Add For This Workspace', id: AutoAdd.SKIP_WORK_SPACE },
     { label: 'Never, I Will Add It Myself For Each Workspaces', id: AutoAdd.SKIP_GLOBAL }
 ];
-
-export const startOperation: OperationConfig = {
-    type: OperationType.START,
-    message: {
-        progress: 'Starting',
-        status: 'Running',
-        result: 'Started'
-    }
-};
-
-export const stopOperation: OperationConfig = {
-    type: OperationType.STOP,
-    message: {
-        progress: 'Stopping',
-        status: 'Stopped',
-        result: 'Stopped'
-    }
-};
-
-export const stopNonRelatedOperation: OperationConfig = {
-    type: OperationType.STOP,
-    message: {
-        progress: 'Stopping Non Related',
-        status: 'Stopped',
-        result: 'Stopped Non Related Container'
-    }
-};

@@ -1,6 +1,6 @@
 import { commands, window } from "vscode";
 
-import { getAllContainersList, getContainersList, ContainerList, extractContainerIds } from "../common/docker";
+import { getAllContainersList, getContainersList, ContainerList, extractContainerIds } from "../common/list";
 import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";

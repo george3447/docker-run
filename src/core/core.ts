@@ -2,20 +2,20 @@ import * as Dockerode from 'dockerode';
 import { DockerOptions } from "dockerode";
 
 import { ext } from "./ext-variables";
-import { ContainerOperation } from '../common/container';
-import { window, commands, workspace, ConfigurationTarget } from 'vscode';
-import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, startOperation, stopOperation, stopNonRelatedOperation, CONFIGURATION } from '../common/constants';
+import { window, commands, ConfigurationTarget } from 'vscode';
+import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, CONFIGURATION } from '../common/constants';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import { isSettingsDisabled, updateSettings } from '../common/settings';
+import { StartOperation, StopNonRelatedOperation, StopOperation} from './operations';
 
 export function initDockerode(options?: DockerOptions) {
     ext.dockerode = new Dockerode(options);
 }
 
 export function initContainerOperations() {
-    ext.startOperation = new ContainerOperation(startOperation);
-    ext.stopOperation = new ContainerOperation(stopOperation);
-    ext.stopNonRelatedOperation = new ContainerOperation(stopNonRelatedOperation);
+    ext.startOperation = new StartOperation();
+    ext.stopOperation = new StopOperation();
+    ext.stopNonRelatedOperation = new StopNonRelatedOperation();
 }
 
 export async function initAutoAdd() {
