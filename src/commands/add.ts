@@ -6,7 +6,10 @@ import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
 export const disposableAdd = commands.registerCommand('docker-run.add', async (createConfigFile?: boolean) => {
-    const availableContainerList = await getAllContainersList(true);
+    const availableContainerList = await getAllContainersList(true).catch((error: Error) => {
+        handleError(error);
+        return [] as ContainerList;
+    });
 
     if (!availableContainerList.length) {
         return window.showInformationMessage(`Not Containers Available`);

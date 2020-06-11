@@ -3,13 +3,17 @@ import { ContainerInspectInfo } from "dockerode";
 
 import { getConfig } from './config';
 import { ext } from '../core/ext-variables';
-import { EmptyConfigError } from "./error";
+import { EmptyConfigError, NoContainersFoundError } from "./error";
 
 export interface ContainerListItem extends QuickPickItem {
     containerId: string;
 }
 
 export type ContainerList = Array<ContainerListItem>;
+
+export function extractContainerIds(containerList: ContainerList) {
+    return containerList.map(containerListItem => containerListItem.containerId);
+}
 
 export async function getContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containers: Array<string> = await getConfig().catch((error: EmptyConfigError) => {
@@ -21,14 +25,10 @@ export async function getContainersList(isAll: boolean, isRunning?: boolean): Pr
 
 export async function getAllContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containers = await ext.dockerode.listContainers({ all: true });
-    if (!containers) {
-        return [];
+    if (!containers || !containers.length) {
+        throw new NoContainersFoundError();
     }
     return getContainerListByContainerIdsAndStatus(containers.map(container => container.Id.substring(0, 12)), isAll, isRunning);
-}
-
-export function extractContainerIds(containerList: ContainerList) {
-    return containerList.map(containerListItem => containerListItem.containerId);
 }
 
 async function getContainerListByContainerIdsAndStatus(containers: string[], isAll: boolean, isRunning?: boolean): Promise<ContainerList> {

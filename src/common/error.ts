@@ -37,13 +37,13 @@ export class DockerrcNotFoundError extends Error {
 
 export class EmptyConfigError extends Error {
 
-    constructor(message: string, private fileName: string) {
+    constructor(message: string, fileName: string) {
         super(message);
         this.setFileName(fileName);
     }
 
     setFileName(fileName: string) {
-        this.name = `Empty Config [${this.fileName}]`;
+        this.name = `Empty Config [${fileName}]`;
     }
 }
 
@@ -58,6 +58,13 @@ export class EmptyConfigFileError extends EmptyConfigError {
 
     constructor(message = 'Configuration File Is Empty', fileName = "Config Util") {
         super(message, fileName);
+    }
+}
+
+export class NoContainersFoundError extends Error {
+
+    constructor(message = 'No Containers Found') {
+        super(message);
     }
 }
 

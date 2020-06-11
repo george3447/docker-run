@@ -14,7 +14,11 @@ export const disposableStopNonRelated = commands.registerCommand('docker-run.sto
             return [] as ContainerList;
         });
 
-        const allRunningContainer = await getAllContainersList(false, true);
+        const allRunningContainer = await getAllContainersList(false, true).catch((error: Error) => {
+            handleError(error);
+            return [] as ContainerList;
+        });
+        
         const nonRelatedContainers = allRunningContainer.filter(runningContainer =>
             !containerList.map(container => container.containerId)
                 .includes(runningContainer.containerId));
