@@ -9,7 +9,7 @@ import { EmptyConfigFileError, NoContainersFoundError } from '../../common/error
 
 let mockContainerIds: Array<string> = [];
 
-const testImage = 'nginx:alpine';
+const testImage = 'nginx:latest';
 
 const getMockContainer = async (port: number) => {
     const container = await ext.dockerode.createContainer({
