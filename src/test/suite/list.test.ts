@@ -52,16 +52,23 @@ suite('List Tests', async () => {
 
     suite('List Tests With Mock Containers', async () => {
 
-        suiteSetup(async () => {
-            await ext.dockerode.pull(testImage, {});
-            mockContainerIds = await getMockContainerIds();
-            await writeConfig(mockContainerIds);
+        suiteSetup((done) => {
+            ext.dockerode.pull(testImage, {}, (err, stream) => {
+                if (err) { return done(err); }
+                stream.pipe(process.stdout);
+                stream.once('end', async () => {
+                    mockContainerIds = await getMockContainerIds();
+                    await writeConfig(mockContainerIds);
+                    done();
+                });
+            });
         });
 
         suiteTeardown(async () => {
             await removeMockContainers();
             await clearDockerrc();
             await setEmptyDockerrc();
+            await ext.dockerode.getImage(testImage).remove();
         });
 
         test("Should extract list of containerIds from container list", async () => {
