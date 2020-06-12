@@ -9,9 +9,11 @@ import { EmptyConfigFileError, NoContainersFoundError } from '../../common/error
 
 let mockContainerIds: Array<string> = [];
 
+const testImage = 'nginx:alpine';
+
 const getMockContainer = async (port: number) => {
     const container = await ext.dockerode.createContainer({
-        Image: 'nginx:alpine',
+        Image: testImage,
         HostConfig: { PortBindings: { ['80/tcp']: [{ "HostPort": `${port}` }] } }
     });
     const containerInfo = await container.inspect();
@@ -51,6 +53,7 @@ suite('List Tests', async () => {
     suite('List Tests With Mock Containers', async () => {
 
         suiteSetup(async () => {
+            await ext.dockerode.pull(testImage, {});
             mockContainerIds = await getMockContainerIds();
             await writeConfig(mockContainerIds);
         });
