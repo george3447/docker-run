@@ -2,13 +2,12 @@ import { workspace, window, languages, commands, WorkspaceEdit, TextEdit } from 
 import { posix } from "path";
 import { existsSync } from "fs";
 
-import { DEFAULT_FILE_NAME, CONFIGURATION } from "./constants";
-import { DockerRcNotFoundError } from "./error-utils";
+import { DEFAULT_FILE_NAME, } from "./constants";
+import { DockerrcNotFoundError, EmptyConfigFileError, EmptyConfigArrayError, NoFolderOrWorkspaceOpenedError } from "./error";
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
-        window.showInformationMessage('No folder or workspace opened');
-        return;
+        throw new NoFolderOrWorkspaceOpenedError();
     }
 
     const folderUri = workspace.workspaceFolders[0].uri;
@@ -20,41 +19,25 @@ export function isConfigAvailable() {
     return !!getFileUri();
 }
 
-export function isAutoGenerateConfigDisabled(): boolean {
-    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
-    const configInfo = workspaceConfiguration.inspect(CONFIGURATION.DISABLE_AUTO_GENERATE_CONFIG);
-    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
-        return true;
-    }
-    return false;
-
-}
-
-export function isAutoStopNonRelatedDisabled(): boolean {
-    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
-    const configInfo = workspaceConfiguration.inspect(CONFIGURATION.DISABLE_AUTO_STOP_NON_RELATED);
-    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
-        return true;
-    }
-    return false;
-
-}
-
 export async function getConfig() {
 
     const fileUri = getFileUri();
 
     if (!fileUri) {
-        throw new DockerRcNotFoundError(`No ${DEFAULT_FILE_NAME} provided`);
+        throw new DockerrcNotFoundError();
     }
 
     const readData = await workspace.fs.readFile(fileUri);
-    const config = JSON.parse(Buffer.from(readData).toString('utf8'));
-
-    if (!config || !config.containers) {
-        return window.showInformationMessage('No container names provided');
+    const stringData = Buffer.from(readData).toString('utf8');
+    if (!stringData) {
+        throw new EmptyConfigFileError();
     }
-    return config;
+    const config = JSON.parse(stringData);
+
+    if (!config || !config.containers || !config.containers.length) {
+        throw new EmptyConfigArrayError();
+    }
+    return config.containers;
 }
 
 export async function writeConfig(containerIds: Array<string>) {

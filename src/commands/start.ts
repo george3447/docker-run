@@ -1,8 +1,8 @@
 import { commands, window } from "vscode";
 
-import { getContainersList } from "../common/docker-utils";
+import { getContainersList } from "../common/list";
 import { ext } from "../core/ext-variables";
-import { handleError } from "../common/error-utils";
+import { handleError } from "../common/error";
 
 export const disposableStart = commands.registerCommand('docker-run.start', async () => {
 

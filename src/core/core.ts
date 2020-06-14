@@ -2,25 +2,25 @@ import * as Dockerode from 'dockerode';
 import { DockerOptions } from "dockerode";
 
 import { ext } from "./ext-variables";
-import { ContainerOperation } from '../common/container-operation';
-import { window, commands, workspace, ConfigurationTarget } from 'vscode';
-import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, startOperation, stopOperation, stopNonRelatedOperation, CONFIGURATION } from '../common/constants';
-import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error-utils';
-import { isAutoStopNonRelatedDisabled, isAutoGenerateConfigDisabled } from '../common/config-utils';
+import { window, commands, ConfigurationTarget } from 'vscode';
+import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, CONFIGURATION } from '../common/constants';
+import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
+import { isSettingsDisabled, updateSettings } from '../common/settings';
+import { StartOperation, StopNonRelatedOperation, StopOperation} from './operations';
 
 export function initDockerode(options?: DockerOptions) {
     ext.dockerode = new Dockerode(options);
 }
 
 export function initContainerOperations() {
-    ext.startOperation = new ContainerOperation(startOperation);
-    ext.stopOperation = new ContainerOperation(stopOperation);
-    ext.stopNonRelatedOperation = new ContainerOperation(stopNonRelatedOperation);
+    ext.startOperation = new StartOperation();
+    ext.stopOperation = new StopOperation();
+    ext.stopNonRelatedOperation = new StopNonRelatedOperation();
 }
 
 export async function initAutoAdd() {
 
-    if (isAutoGenerateConfigDisabled()) {
+    if (isSettingsDisabled(CONFIGURATION.DISABLE_AUTO_GENERATE_CONFIG)) {
         throw new AutoGenerateConfigDisabledError('Disabled auto generation of file');
     }
 
@@ -36,8 +36,7 @@ export async function initAutoAdd() {
             case AutoAdd.SKIP_WORK_SPACE:
             case AutoAdd.SKIP_GLOBAL:
                 const configurationTarget = selection.id === AutoAdd.SKIP_GLOBAL ? ConfigurationTarget.Global : ConfigurationTarget.Workspace;
-                const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
-                await workspaceConfiguration.update(CONFIGURATION.DISABLE_AUTO_GENERATE_CONFIG, true, configurationTarget);
+                await updateSettings(CONFIGURATION.DISABLE_AUTO_GENERATE_CONFIG, true, configurationTarget);
                 break;
             case AutoAdd.No:
                 break;
@@ -48,7 +47,7 @@ export async function initAutoAdd() {
 export async function initAutoStart() {
     await commands.executeCommand('docker-run.start:all');
     
-    if (isAutoStopNonRelatedDisabled()) {
+    if (isSettingsDisabled(CONFIGURATION.DISABLE_AUTO_STOP_NON_RELATED)) {
         throw new AutoStopNonRelatedDisabledError('Disabled auto stopping of non related containers');
     }
 

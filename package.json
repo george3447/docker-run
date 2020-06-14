@@ -2,7 +2,7 @@
   "name": "docker-run",
   "displayName": "Docker Run",
   "description": "Start your docker containers automatically for each workspace",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "icon": "images/icon.png",
   "author": {
     "name": "Georgekutty Antony",
@@ -82,9 +82,9 @@
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./",
+    "test-compile": "tsc -p ./",
     "lint": "eslint src --ext ts",
-    "pretest": "npm run compile && npm run lint",
+    "pretest": "npm run test-compile && npm run lint",
     "vscode:prepublish": "webpack --mode=production",
     "webpack": "webpack --mode=development",
     "webpack-dev": "webpack --mode=development --watch --info-verbosity=verbose",

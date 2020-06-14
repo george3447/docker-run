@@ -1,9 +1,9 @@
 import { commands, window } from "vscode";
 
-import { getContainersList, ContainerList, extractContainerIds } from "../common/docker-utils";
-import { writeConfig } from "../common/config-utils";
+import { getContainersList, ContainerList, extractContainerIds } from "../common/list";
+import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
-import { handleError } from "../common/error-utils";
+import { handleError } from "../common/error";
 
 export const disposableRemove = commands.registerCommand('docker-run.remove', async () => {
     const containerList = await getContainersList(true).catch((error: Error) => {

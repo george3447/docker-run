@@ -1,0 +1,4 @@
+{
+    "DockerRun.DisableAutoGenerateConfig": false,
+    "DockerRun.DisableAutoStopNonRelated": false
+}

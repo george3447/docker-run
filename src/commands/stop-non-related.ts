@@ -1,8 +1,8 @@
 import { ProgressLocation, window, commands } from "vscode";
 
-import { getContainersList, ContainerList, getAllContainersList } from "../common/docker-utils";
+import { getContainersList, ContainerList, getAllContainersList } from "../common/list";
 import { ext } from "../core/ext-variables";
-import { handleError } from "../common/error-utils";
+import { handleError } from "../common/error";
 
 export const disposableStopNonRelated = commands.registerCommand('docker-run.stop:non-related', async () => {
     const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping Non Related Containers' };
@@ -14,7 +14,11 @@ export const disposableStopNonRelated = commands.registerCommand('docker-run.sto
             return [] as ContainerList;
         });
 
-        const allRunningContainer = await getAllContainersList(false, true);
+        const allRunningContainer = await getAllContainersList(false, true).catch((error: Error) => {
+            handleError(error);
+            return [] as ContainerList;
+        });
+        
         const nonRelatedContainers = allRunningContainer.filter(runningContainer =>
             !containerList.map(container => container.containerId)
                 .includes(runningContainer.containerId));

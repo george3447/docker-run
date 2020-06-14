@@ -1,8 +1,8 @@
 import { ProgressLocation, window, commands } from "vscode";
 
-import { getContainersList, ContainerList } from "../common/docker-utils";
+import { getContainersList, ContainerList } from "../common/list";
 import { ext } from "../core/ext-variables";
-import { handleError } from "../common/error-utils";
+import { handleError } from "../common/error";
 
 export const disposableStopAll = commands.registerCommand('docker-run.stop:all', async () => {
     const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping All Containers' };
