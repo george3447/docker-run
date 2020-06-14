@@ -9,10 +9,6 @@ Extension for automatically start docker containers required for the current wor
 * Configurable via `.dockerrc` file and commands
 * Perfect companion extension for [vscode docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
 
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
 ## Extension Settings
 
 * `DockerRun.DisableAutoGenerateConfig`: Disable auto generation of config file

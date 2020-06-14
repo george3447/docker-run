@@ -2,7 +2,10 @@ name: Build And Publish
 on:
   push:
     branches:
-      - feature/test-cases
+      - feature/ci
+  release:
+    types:
+      - created
 
 jobs:
   build:
@@ -19,3 +22,8 @@ jobs:
       uses: GabrielBB/xvfb-action@v1.2
       with:
         run: npm test
+    - name: Publish
+      if: success()
+      run: npm run deploy
+      env:
+        VSCE_PAT: ${{ secrets.VSCE_TOKEN }}

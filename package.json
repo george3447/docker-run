@@ -82,13 +82,14 @@
     ]
   },
   "scripts": {
-    "test-compile": "tsc -p ./",
+    "deploy": "vsce publish --yarn",
     "lint": "eslint src --ext ts",
     "pretest": "npm run test-compile && npm run lint",
+    "test": "node ./out/test/runTest.js",
+    "test-compile": "tsc -p ./",
     "vscode:prepublish": "webpack --mode=production",
     "webpack": "webpack --mode=development",
-    "webpack-dev": "webpack --mode=development --watch --info-verbosity=verbose",
-    "test": "node ./out/test/runTest.js"
+    "webpack-dev": "webpack --mode=development --watch --info-verbosity=verbose"
   },
   "devDependencies": {
     "@types/dockerode": "^2.5.29",
@@ -103,6 +104,7 @@
     "mocha": "^7.1.2",
     "ts-loader": "^7.0.5",
     "typescript": "^3.8.3",
+    "vsce": "^1.76.1",
     "vscode-test": "^1.3.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
