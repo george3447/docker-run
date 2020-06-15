@@ -1,9 +1,15 @@
 # Change Log
 
-All notable changes to the "docker-run" extension will be documented in this file.
+## [1.0.0] - 2020-06-15
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Added
 
-## [Unreleased]
+- Auto run docker container based on dockerrc
 
-- Initial release
+- Start all and stop all commands
+  
+- Settings based auto start
+
+- Command for stopping non related containers
+
+- Add, remove, start and stop commands

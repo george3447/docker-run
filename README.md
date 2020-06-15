@@ -1,6 +1,8 @@
-# Docker Run
+# Docker Run ![Version](https://vsmarketplacebadge.apphb.com/version/george3447.docker-run.svg) ![Build](https://github.com/george3447/docker-run/workflows/Build/badge.svg?branch=master)
 
 Extension for automatically start docker containers required for the current workspace.
+
+![Extension overview](/images/demo.gif)
 
 ## Features
 * Automatically start containers for the current workspace
@@ -9,19 +11,17 @@ Extension for automatically start docker containers required for the current wor
 * Configurable via `.dockerrc` file and commands
 * Perfect companion extension for [vscode docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
 
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
 ## Extension Settings
 
 * `DockerRun.DisableAutoGenerateConfig`: Disable auto generation of config file
 * `DockerRun.DisableAutoStopNonRelated`: Disable auto stopping of non related containers
 
-## Release Notes
+## Changelog
 
-### 1.0.0
+- [https://github.com/george3447/docker-run/blob/master/CHANGELOG.md](https://github.com/george3447/docker-run/blob/master/CHANGELOG.md)
 
-Initial release
 
+## License
+
+- [https://github.com/george3447/docker-run/blob/master/LICENSE](https://github.com/george3447/docker-run/blob/master/LICENSE)
 
