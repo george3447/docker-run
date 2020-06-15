@@ -1,4 +1,4 @@
-# Docker Run ![Version](https://vsmarketplacebadge.apphb.com/version/george3447.docker-run.svg) ![Build](https://github.com/george3447/docker-run/workflows/Build/badge.svg?branch=master)
+# Docker Run ![Version](https://vsmarketplacebadge.apphb.com/version/george3447.docker-run.svg)
 
 Extension for automatically start docker containers required for the current workspace.
 
