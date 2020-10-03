@@ -12,7 +12,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
     });
 
     if (!availableContainerList.length) {
-        return window.showInformationMessage(`Not Containers Available`);
+        return window.showInformationMessage(`No Containers Available`);
     }
 
     if (createConfigFile) {
