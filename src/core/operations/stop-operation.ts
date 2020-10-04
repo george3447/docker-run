@@ -12,7 +12,8 @@ export class StopOperation extends Operation {
         });
     }
 
-    async operate(container: Container) {
+    async operate(container: Container, label: string) {
         await container.stop();
+        this.showMessage(label);
     }
 }

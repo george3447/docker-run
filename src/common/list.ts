@@ -31,17 +31,28 @@ export async function getAllContainersList(isAll: boolean, isRunning?: boolean):
     return getContainerListByContainerIdsAndStatus(containers.map(container => container.Id.substring(0, 12)), isAll, isRunning);
 }
 
+export async function isContainerExists(containerId: string): Promise<boolean> {
+    const containers = await ext.dockerode.listContainers({ all: true });
+    if (!containers || !containers.length) {
+        return false;
+    }
+    return containers.findIndex(container => container.Id.substring(0, 12) === containerId) > -1;
+}
+
 async function getContainerListByContainerIdsAndStatus(containers: string[], isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containersList = [];
     for (let i = 0; i < containers.length; i++) {
 
         const containerId = containers[i];
-        const container = ext.dockerode.getContainer(containerId);
-        const containerInfo = await container.inspect();
+        const isExists = await isContainerExists(containerId);
+        if (isExists) {
+            const container = ext.dockerode.getContainer(containerId);
+            const containerInfo = await container.inspect();
 
-        if (isAll || containerInfo.State.Running === isRunning) {
-            const label = getContainerLabel(containerInfo);
-            containersList.push({ label, containerId });
+            if (isAll || containerInfo.State.Running === isRunning) {
+                const label = getContainerLabel(containerInfo);
+                containersList.push({ label, containerId });
+            }
         }
     }
     return containersList;

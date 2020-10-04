@@ -23,5 +23,6 @@ export class StartOperation extends Operation {
         }
 
         await container.start();
+        this.showMessage(label);
     }
 }

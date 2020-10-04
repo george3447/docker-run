@@ -1,15 +1,13 @@
 import * as assert from 'assert';
 import { window, extensions } from 'vscode';
 
-import { writeConfig, getConfig } from '../../common/config';
-import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../common/error';
-import { clearDockerrc, setEmptyDockerrc } from '../utils/common';
+import { writeConfig, getConfig } from '../../../common/config';
+import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../../common/error';
+import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 
 const mockContainerIds = ["asd123asd123", "123asd123asd123asd"];
 
 suite('Config Tests', async () => {
-
-	window.showInformationMessage('Start all tests.');
 
 	test("Should start the extension", async () => {
 		const started = extensions.getExtension("george3447.docker-run")?.isActive;
@@ -31,7 +29,7 @@ suite('Config Tests', async () => {
 		await assert.rejects(async () => await getConfig(), new EmptyConfigArrayError());
 	});
 
-	suite('Config Tests With Mock Config', async () => {
+	suite('With Mock Config', async () => {
 
 		teardown(async () => {
 			await writeConfig([]);

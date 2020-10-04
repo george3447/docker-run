@@ -12,5 +12,5 @@
         "Georgekutty",
         "dockerrc"
     ],
-    "DockerRun.DisableAutoGenerateConfig": true
+    "DockerRun.DisableAutoGenerateConfig": true,
 }
