@@ -14,15 +14,25 @@ let mockContainerIds: Array<string> = [];
 
 suite('Start Operation Tests', async () => {
 
+    let spyShowInformationMessage: SinonSpy;
+    let spyWithProgress: SinonSpy;
+
     suiteSetup(async () => {
         initDockerode();
         ext.startOperation = new StartOperation();
     });
 
-    suite('With Single Container', async () => {
+    setup(async () => {
+        spyShowInformationMessage = spy(window, "showInformationMessage");
+        spyWithProgress = spy(window, "withProgress");
+    });
 
-        let spyShowInformationMessage: SinonSpy;
-        let spyWithProgress: SinonSpy;
+    teardown(async () => {
+        spyShowInformationMessage.restore();
+        spyWithProgress.restore();
+    });
+
+    suite('With Single Container', async () => {
 
         suiteSetup((done) => {
             ext.dockerode.pull(testImage, {}, (err, stream) => {
@@ -34,16 +44,6 @@ suite('Start Operation Tests', async () => {
                     done();
                 });
             });
-        });
-
-        setup(async () => {
-            spyShowInformationMessage = spy(window, "showInformationMessage");
-            spyWithProgress = spy(window, "withProgress");
-        });
-
-        teardown(async () => {
-            spyShowInformationMessage.restore();
-            spyWithProgress.restore();
         });
 
         suiteTeardown(async () => {
@@ -110,9 +110,6 @@ suite('Start Operation Tests', async () => {
 
     suite('With Multiple Containers', async () => {
 
-        let spyShowInformationMessage: SinonSpy;
-        let spyWithProgress: SinonSpy;
-
         suiteSetup((done) => {
             ext.dockerode.pull(testImage, {}, (err, stream) => {
                 if (err) { return done(err); }
@@ -123,16 +120,6 @@ suite('Start Operation Tests', async () => {
                     done();
                 });
             });
-        });
-
-        setup(async () => {
-            spyShowInformationMessage = spy(window, "showInformationMessage");
-            spyWithProgress = spy(window, "withProgress");
-        });
-
-        teardown(async () => {
-            spyShowInformationMessage.restore();
-            spyWithProgress.restore();
         });
 
         suiteTeardown(async () => {
