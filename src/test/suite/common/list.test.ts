@@ -62,7 +62,7 @@ suite('List Tests', async () => {
         test("Should get list of all containers", async () => {
             const etcContainerId = await getMockContainer(8084);
             const containersList = await getAllContainersList(true);
-            await removeMockContainer(etcContainerId)
+            await removeMockContainer(etcContainerId);
             const expected = [etcContainerId, ...mockContainerIds];
             assert.strictEqual(containersList.length, expected.length);
         });
