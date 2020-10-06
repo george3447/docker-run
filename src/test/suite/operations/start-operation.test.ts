@@ -3,10 +3,9 @@ import { expect, assert } from 'chai';
 import { window } from 'vscode';
 
 import { writeConfig } from '../../../common/config';
-import { testImage, getMockContainerIds, removeMockContainers } from '../../utils/container';
+import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
-import { initDockerode } from '../../../core/core';
 import { StartOperation } from '../../../core/operations';
 import { getAllContainersList, getContainersList } from '../../../common/list';
 
@@ -18,7 +17,6 @@ suite('Start Operation Tests', async () => {
     let spyWithProgress: SinonSpy;
 
     suiteSetup(async () => {
-        initDockerode();
         ext.startOperation = new StartOperation();
     });
 
@@ -34,27 +32,18 @@ suite('Start Operation Tests', async () => {
 
     suite('With Single Container', async () => {
 
-        suiteSetup((done) => {
-            ext.dockerode.pull(testImage, {}, (err, stream) => {
-                if (err) { return done(err); }
-                stream.pipe(process.stdout);
-                stream.once('end', async () => {
-                    mockContainerIds = await getMockContainerIds(1);
-                    await writeConfig(mockContainerIds);
-                    done();
-                });
-            });
+        suiteSetup(async () => {
+            mockContainerIds = await getMockContainerIds(1);
+            await writeConfig(mockContainerIds);
         });
+
 
         suiteTeardown(async () => {
             await Promise.all([
                 removeMockContainers(mockContainerIds),
                 clearDockerrc()
             ]);
-            await Promise.all([
-                ext.dockerode.getImage(testImage).remove(),
-                setEmptyDockerrc()
-            ]);
+            await setEmptyDockerrc();
         });
 
         test("Should start the container", async () => {
@@ -110,16 +99,10 @@ suite('Start Operation Tests', async () => {
 
     suite('With Multiple Containers', async () => {
 
-        suiteSetup((done) => {
-            ext.dockerode.pull(testImage, {}, (err, stream) => {
-                if (err) { return done(err); }
-                stream.pipe(process.stdout);
-                stream.once('end', async () => {
-                    mockContainerIds = await getMockContainerIds(3);
-                    await writeConfig(mockContainerIds);
-                    done();
-                });
-            });
+        suiteSetup(async () => {
+            mockContainerIds = await getMockContainerIds(3);
+            await writeConfig(mockContainerIds);
+
         });
 
         suiteTeardown(async () => {
@@ -127,10 +110,7 @@ suite('Start Operation Tests', async () => {
                 removeMockContainers(mockContainerIds),
                 clearDockerrc()
             ]);
-            await Promise.all([
-                ext.dockerode.getImage(testImage).remove(),
-                setEmptyDockerrc()
-            ]);
+            await setEmptyDockerrc();
         });
 
         test("Should start all containers", async () => {

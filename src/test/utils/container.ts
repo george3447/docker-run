@@ -23,10 +23,14 @@ export const getMockContainerIds = async (reqNumberOfContainers: number) => {
     return await Promise.all(mockContainers);
 };
 
+export const removeMockContainer = async (mockContainerId: string) => {
+    await ext.dockerode.getContainer(mockContainerId).remove({ force: true, v: true });
+};
+
 export const removeMockContainers = async (mockContainerIds: Array<string>) => {
     const removePromises: Array<Promise<void>> = [];
     mockContainerIds.forEach(containerId => {
-        removePromises.push(ext.dockerode.getContainer(containerId).remove({ force: true }));
+        removePromises.push(removeMockContainer(containerId));
     });
     await Promise.all(removePromises);
 };
