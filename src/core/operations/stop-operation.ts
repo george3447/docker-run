@@ -12,7 +12,16 @@ export class StopOperation extends Operation {
         });
     }
 
-    async operate(container: Container) {
+    async operate(container: Container, label: string) {
+
+        const containerInfo = await container.inspect();
+        const { State: { Running } } = containerInfo;
+
+        if (Running === false) {
+            return;
+        }
+
         await container.stop();
+        this.showMessage(label);
     }
 }

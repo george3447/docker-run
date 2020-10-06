@@ -1,7 +1,7 @@
 import { Progress, window, ProgressLocation } from "vscode";
 import { Container } from "dockerode";
 
-import { ContainerList, ContainerListItem } from "../../common/list";
+import { ContainerList, ContainerListItem, isContainerExists } from "../../common/list";
 import { ext } from "../ext-variables";
 
 export interface OperationConfig {
@@ -26,13 +26,13 @@ export abstract class Operation {
         if (selection.length === 1) {
             const [containerListItem] = selection;
             const progressOptions = { location: ProgressLocation.Notification, title: `${progress} Container ${containerListItem.label}` };
-            window.withProgress(progressOptions, (async () => {
+            await window.withProgress(progressOptions, (async () => {
                 await this.operateContainer(containerListItem);
             }));
         }
         else {
             const progressOptions = { location: ProgressLocation.Notification, title: `${progress} Selected Containers` };
-            window.withProgress(progressOptions, (async (progress) => {
+            await window.withProgress(progressOptions, (async (progress) => {
                 await this.operateContainersWithProgress(selection, progress);
             }));
         }
@@ -48,25 +48,27 @@ export abstract class Operation {
         progress.report({ message: `0/${containersLength}` });
 
         for (let i = 0; i < containersLength; i++) {
-
             progress.report({ message: `${i + 1}/${containersLength}` });
 
             await this.operateContainer(containers[i]);
         }
     }
 
-    async operateContainer(containerListItem: ContainerListItem) {
-
-        const { message } = this.operationConfig;
+    private async operateContainer(containerListItem: ContainerListItem) {
         const { containerId, label } = containerListItem;
-        const container = ext.dockerode.getContainer(containerId);
+        const isContainerExist = await isContainerExists(containerId);
 
-        if (!container) {
+        if (!isContainerExist) {
             window.showErrorMessage(`No Container With Given Container Id ${containerId} Found`);
             return;
         }
 
+        const container = ext.dockerode.getContainer(containerId);
         await this.operate(container, label);
+    }
+
+    protected showMessage(label: string) {
+        const { message } = this.operationConfig;
         window.showInformationMessage(`Successfully ${message.result} ${label}`);
     }
 }

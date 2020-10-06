@@ -1,46 +1,15 @@
 import * as assert from 'assert';
 
-import { clearDockerrc, setEmptyDockerrc } from '../utils/common';
-import { writeConfig } from '../../common/config';
-import { getContainersList, extractContainerIds, getAllContainersList } from '../../common/list';
-import { initDockerode } from '../../core/core';
-import { ext } from '../../core/ext-variables';
-import { EmptyConfigFileError, NoContainersFoundError } from '../../common/error';
+import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
+import { getMockContainer, getMockContainerIds, removeMockContainer, removeMockContainers } from '../../utils/container';
+import { writeConfig } from '../../../common/config';
+import { getContainersList, extractContainerIds, getAllContainersList } from '../../../common/list';
+import { ext } from '../../../core/ext-variables';
+import { EmptyConfigFileError, NoContainersFoundError } from '../../../common/error';
 
 let mockContainerIds: Array<string> = [];
 
-const testImage = 'm4rcu5/lighttpd:latest';
-
-const getMockContainer = async (port: number) => {
-    const container = await ext.dockerode.createContainer({
-        Image: testImage,
-        HostConfig: { PortBindings: { ['80/tcp']: [{ "HostPort": `${port}` }] } }
-    });
-    const containerInfo = await container.inspect();
-    return containerInfo.Id.substring(0, 12);
-};
-
-const getMockContainerIds = async () => {
-    return await Promise.all([
-        getMockContainer(8081),
-        getMockContainer(8082),
-        getMockContainer(8083)
-    ]);
-};
-
-const removeMockContainers = async () => {
-    const removePromises: Array<Promise<void>> = [];
-    mockContainerIds.forEach(containerId => {
-        removePromises.push(ext.dockerode.getContainer(containerId).remove({ force: true }));
-    });
-    await Promise.all(removePromises);
-};
-
 suite('List Tests', async () => {
-
-    suiteSetup(async () => {
-        initDockerode();
-    });
 
     test("Should throw empty config file error ", async () => {
         await assert.rejects(async () => getContainersList(true), new EmptyConfigFileError(undefined, 'Docker Utils'));
@@ -50,25 +19,17 @@ suite('List Tests', async () => {
         await assert.rejects(async () => getAllContainersList(true), new NoContainersFoundError(undefined));
     });
 
-    suite('List Tests With Mock Containers', async () => {
+    suite('With Mock Containers', async () => {
 
-        suiteSetup((done) => {
-            ext.dockerode.pull(testImage, {}, (err, stream) => {
-                if (err) { return done(err); }
-                stream.pipe(process.stdout);
-                stream.once('end', async () => {
-                    mockContainerIds = await getMockContainerIds();
-                    await writeConfig(mockContainerIds);
-                    done();
-                });
-            });
+        suiteSetup(async () => {
+            mockContainerIds = await getMockContainerIds(3);
+            await writeConfig(mockContainerIds);
         });
 
         suiteTeardown(async () => {
-            await removeMockContainers();
+            await removeMockContainers(mockContainerIds);
             await clearDockerrc();
             await setEmptyDockerrc();
-            await ext.dockerode.getImage(testImage).remove();
         });
 
         test("Should extract list of containerIds from container list", async () => {
@@ -101,7 +62,7 @@ suite('List Tests', async () => {
         test("Should get list of all containers", async () => {
             const etcContainerId = await getMockContainer(8084);
             const containersList = await getAllContainersList(true);
-            await ext.dockerode.getContainer(etcContainerId).remove({ force: true });
+            await removeMockContainer(etcContainerId)
             const expected = [etcContainerId, ...mockContainerIds];
             assert.strictEqual(containersList.length, expected.length);
         });
@@ -115,7 +76,7 @@ suite('List Tests', async () => {
             await Promise.all([
                 startedContainer1.stop(),
                 startedContainer2.stop(),
-                ext.dockerode.getContainer(etcContainerId).remove({ force: true })
+                removeMockContainer(etcContainerId)
             ]);
             assert.strictEqual(containersList.length, 2);
         });
@@ -129,7 +90,7 @@ suite('List Tests', async () => {
             await Promise.all([
                 startedContainer1.stop(),
                 startedContainer2.stop(),
-                ext.dockerode.getContainer(etcContainerId).remove({ force: true })
+                removeMockContainer(etcContainerId)
             ]);
             assert.strictEqual(containersList.length, 2);
         });
