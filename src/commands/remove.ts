@@ -12,7 +12,8 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
     });
 
     if (!containerList.length) {
-        return window.showInformationMessage(`Please Add At least One Container`);
+        window.showWarningMessage(`Please Add At least One Container To Workspace`);
+        return;
     }
 
     const selection = await window.showQuickPick(containerList, {
@@ -21,9 +22,15 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
     });
 
     if (selection && selection.length > 0) {
-        const containerIds = extractContainerIds(containerList.filter(containerListItem => !selection.includes(containerListItem)));
+        const containerIds = extractContainerIds(containerList
+            .filter(({ containerId }) => selection
+                .findIndex(({ containerId: selectedContainerId }) => selectedContainerId === containerId) === -1));
+
         await writeConfig(containerIds);
         await ext.stopOperation.operateContainers(selection);
+    } else {
+        window.showWarningMessage(`Please Select At least One Container To Remove`);
+        return;
     }
 
 });
