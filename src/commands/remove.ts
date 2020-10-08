@@ -1,12 +1,12 @@
 import { commands, window } from "vscode";
 
-import { getContainersList, ContainerList, extractContainerIds } from "../common/list";
+import { getWorkspaceContainers, ContainerList, extractContainerIds } from "../common/list";
 import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
 export const disposableRemove = commands.registerCommand('docker-run.remove', async () => {
-    const containerList = await getContainersList(true).catch((error: Error) => {
+    const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
         handleError(error);
         return [] as ContainerList;
     });
@@ -24,7 +24,7 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
     if (selection && selection.length > 0) {
         const containerIds = extractContainerIds(containerList
             .filter(({ containerId }) => selection
-                .findIndex(({ containerId: selectedContainerId }) => selectedContainerId === containerId) === -1));
+                .findIndex((selectedItem) => selectedItem.containerId === containerId) < 0));
 
         await writeConfig(containerIds);
         await ext.stopOperation.operateContainers(selection);

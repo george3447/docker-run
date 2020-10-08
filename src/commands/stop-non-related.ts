@@ -1,6 +1,6 @@
 import { ProgressLocation, window, commands } from "vscode";
 
-import { getContainersList, ContainerList, getAllContainersList } from "../common/list";
+import { getWorkspaceContainers, ContainerList, getGlobalContainers } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
@@ -9,12 +9,12 @@ export const disposableStopNonRelated = commands.registerCommand('docker-run.sto
 
     window.withProgress(progressOptions, (async (progress) => {
 
-        const containerList = await getContainersList(true).catch((error: Error) => {
+        const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
             handleError(error);
             return [] as ContainerList;
         });
 
-        const allRunningContainer = await getAllContainersList(false, true).catch((error: Error) => {
+        const allRunningContainer = await getGlobalContainers(false, true).catch((error: Error) => {
             handleError(error);
             return [] as ContainerList;
         });

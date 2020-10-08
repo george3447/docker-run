@@ -1,6 +1,6 @@
 import { commands, window } from "vscode";
 
-import { getAllContainersList, getContainersList, ContainerList, extractContainerIds } from "../common/list";
+import { getGlobalContainers, getWorkspaceContainers, ContainerList, extractContainerIds } from "../common/list";
 import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
@@ -10,7 +10,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
     let quickPickList: ContainerList;
     let containersToExtract: ContainerList = [];
 
-    const availableContainerList = await getAllContainersList(true).catch((error: Error) => {
+    const availableContainerList = await getGlobalContainers(true).catch((error: Error) => {
         handleError(error);
         return [] as ContainerList;
     });
@@ -21,7 +21,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
     }
 
     if (!createConfigFile) {
-        const containerList = await getContainersList(true).catch((error: Error) => {
+        const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
             handleError(error);
             return [] as ContainerList;
         });

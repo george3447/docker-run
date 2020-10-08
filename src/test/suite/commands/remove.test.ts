@@ -48,10 +48,8 @@ suite('Remove Command Tests', async () => {
     suite('With Containers In Config', async () => {
 
         teardown(async () => {
-            await Promise.all([
-                removeMockContainers(mockContainerIds),
-                clearDockerrc()
-            ]);
+            await removeMockContainers(mockContainerIds);
+            await clearDockerrc();
             await setEmptyDockerrc();
         });
 
@@ -99,23 +97,21 @@ suite('Remove Command Tests', async () => {
 
         test("Should remove multiple containers and update config, if multiple containers selected", async () => {
             mockContainerIds = await getMockContainerIds(3);
-            await writeConfig(mockContainerIds);
-            const [selectedContainer1, selectedContainer2, ...remainingContainers] = mockContainerIds;
-            await ext.dockerode.getContainer(selectedContainer1).start();
-            await ext.dockerode.getContainer(selectedContainer2).start();
-            
-            stubQuickPick.resolves([
-                { label: 'Test', containerId: selectedContainer1 },
-                { label: 'Test2', containerId: selectedContainer2 }
-            ] as any);
+            const remainingContainers = [mockContainerIds[0]];
+            const selectedContainers = [mockContainerIds[1], mockContainerIds[2]];
+            await Promise.all(selectedContainers
+                .map(selectedContainerId => ext.dockerode.getContainer(selectedContainerId).start()));
+            stubQuickPick.resolves(selectedContainers
+                .map((containerId, index) => ({ label: `Test_${index + 1}`, containerId })) as any);
 
+            await writeConfig(mockContainerIds);
             await commands.executeCommand('docker-run.remove');
+
             const availableContainers = await getConfig();
 
             assert.ok(stubQuickPick.calledOnce);
             assert.ok(spyWithProgress.calledAfter(stubQuickPick));
             assert.ok(spyShowInformationMessage.calledAfter(spyWithProgress));
-            assert.ok(spyShowInformationMessage.calledTwice);
             expect(remainingContainers).to.have.deep.members(availableContainers);
         });
 

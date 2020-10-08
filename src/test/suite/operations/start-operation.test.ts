@@ -7,7 +7,7 @@ import { getMockContainerIds, removeMockContainers } from '../../utils/container
 import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StartOperation } from '../../../core/operations';
-import { getAllContainersList, getContainersList } from '../../../common/list';
+import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
 
 let mockContainerIds: Array<string> = [];
 
@@ -48,12 +48,12 @@ suite('Start Operation Tests', async () => {
 
         test("Should start the container", async () => {
 
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.startOperation.operateContainers(mockContainersList);
 
             const mockMessage = `Successfully Started ${mockContainersList[0].label}`;
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
-            const runningContainers = await getAllContainersList(false, true);
+            const runningContainers = await getGlobalContainers(false, true);
 
             assert.ok(spyWithProgress.calledOnce);
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
@@ -66,12 +66,12 @@ suite('Start Operation Tests', async () => {
         test("Should show container already running message", async () => {
 
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.startOperation.operateContainers(mockContainersList);
 
             const mockMessage = `Container ${mockContainersList[0].label} Already Running`;
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
-            const runningContainers = await getAllContainersList(false, true);
+            const runningContainers = await getGlobalContainers(false, true);
 
             assert.ok(spyWithProgress.calledOnce);
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
@@ -83,7 +83,7 @@ suite('Start Operation Tests', async () => {
 
         test("Should show container not found message", async () => {
             const spyShowErrorMessage = spy(window, "showErrorMessage");
-            const mockContainersList = (await getContainersList(true))
+            const mockContainersList = (await getWorkspaceContainers(true))
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.startOperation.operateContainers(mockContainersList);
 
@@ -115,12 +115,12 @@ suite('Start Operation Tests', async () => {
 
         test("Should start all containers", async () => {
 
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.startOperation.operateContainers(mockContainersList);
 
             const mockMessages = mockContainersList.map(({ label }) => `Successfully Started ${label}`);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
-            const runningContainers = await getAllContainersList(false, true);
+            const runningContainers = await getGlobalContainers(false, true);
 
             assert.ok(spyWithProgress.calledOnce);
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
@@ -133,12 +133,12 @@ suite('Start Operation Tests', async () => {
         test("Should show containers already running message", async () => {
 
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.startOperation.operateContainers(mockContainersList);
 
             const mockMessages = mockContainersList.map(({ label }) => `Container ${label} Already Running`);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
-            const runningContainers = await getAllContainersList(false, true);
+            const runningContainers = await getGlobalContainers(false, true);
 
             assert.ok(spyWithProgress.calledOnce);
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
@@ -150,7 +150,7 @@ suite('Start Operation Tests', async () => {
 
         test("Should show container not found message", async () => {
             const spyShowErrorMessage = spy(window, "showErrorMessage");
-            const mockContainersList = (await getContainersList(true))
+            const mockContainersList = (await getWorkspaceContainers(true))
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.startOperation.operateContainers(mockContainersList);
 

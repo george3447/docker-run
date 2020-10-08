@@ -1,12 +1,12 @@
 import { commands, window } from "vscode";
 
-import { getContainersList } from "../common/list";
+import { getWorkspaceContainers } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
 export const disposableStart = commands.registerCommand('docker-run.start', async () => {
 
-    const stoppedContainerList = await getContainersList(false, false).catch((error: Error) => {
+    const stoppedContainerList = await getWorkspaceContainers(false, false).catch((error: Error) => {
         handleError(error);
         return;
     });
