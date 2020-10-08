@@ -7,7 +7,6 @@ import { testImage } from '../utils/container';
 let stubConsoleWarn: SinonStub;
 
 suiteSetup((done) => {
-    stubConsoleWarn = stub(console, 'warn');
     initDockerode();
     ext.dockerode.pull(testImage, {}, (err, stream) => {
         if (err) { return done(err); }
@@ -18,6 +17,10 @@ suiteSetup((done) => {
     });
 });
 
-suiteTeardown(async () => {
+setup(() => {
+    stubConsoleWarn = stub(console, 'warn');
+});
+
+teardown(() => {
     stubConsoleWarn.restore();
 });

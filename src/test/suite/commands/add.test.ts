@@ -1,4 +1,4 @@
-import { spy, SinonSpy, stub, SinonStub } from 'sinon';
+import { spy, SinonSpy, stub, SinonStub, restore } from 'sinon';
 import { expect, assert } from 'chai';
 import { window, commands } from 'vscode';
 
@@ -13,45 +13,41 @@ let mockContainerIds: Array<string> = [];
 
 suite('Add Command Tests', async () => {
 
+    let stubQuickPick: SinonStub;
     let spyShowInformationMessage: SinonSpy;
     let spyWithProgress: SinonSpy;
+    let spyShowWarningMessage: SinonSpy;
 
     suiteSetup(async () => {
         ext.startOperation = new StartOperation();
     });
 
     setup(async () => {
+        spyShowWarningMessage = spy(window, 'showWarningMessage');
         spyShowInformationMessage = spy(window, "showInformationMessage");
         spyWithProgress = spy(window, "withProgress");
+        stubQuickPick = stub(window, 'showQuickPick');
     });
 
     teardown(async () => {
-        spyShowInformationMessage.restore();
-        spyWithProgress.restore();
+        restore();
     });
 
 
     suite('With No Available Container', async () => {
 
-        test("Should show no container available message", async () => {
+        test("Should show no container found message", async () => {
             await commands.executeCommand('docker-run.add');
-            const mockMessage = `No Containers Available`;
-            const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
+            const mockMessage = `No Containers Found`;
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
-            assert.strictEqual(mockMessage, spyShowInformationMessageArgs);
+            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
         });
     });
 
     suite('With Available Containers', async () => {
 
-        let stubQuickPick: SinonStub;
-
-        setup(() => {
-            stubQuickPick = stub(window, 'showQuickPick');
-        });
-
         teardown(async () => {
-            stubQuickPick.restore();
             await Promise.all([
                 removeMockContainers(mockContainerIds),
                 clearDockerrc()
@@ -65,10 +61,10 @@ suite('Add Command Tests', async () => {
             await writeConfig(mockContainerIds);
 
             await commands.executeCommand('docker-run.add');
-            const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
-            const mockMessage = `All Available Containers Are Already Added`;
-            assert.ok(spyShowInformationMessage.calledOnce);
-            assert.strictEqual(mockMessage, spyShowInformationMessageArgs);
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
+            const mockMessage = `All Available Containers Are Already Added To Workspace`;
+            assert.ok(spyShowWarningMessage.calledOnce);
+            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
         });
 
         test("Should show quick pick with available containers, if no config file available", async () => {
@@ -95,7 +91,19 @@ suite('Add Command Tests', async () => {
         });
 
 
-        test("Should show quick pick, create config and start single container", async () => {
+        test("Should show 'select at least one container' warning message, if no container selected", async () => {
+            mockContainerIds = await getMockContainerIds(3);
+            stubQuickPick.resolves([] as any);
+            const mockMessage = `Please Select At least One Container To Add`;
+
+            await commands.executeCommand('docker-run.add');
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
+
+            assert.ok(stubQuickPick.calledOnce);
+            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
+        });
+
+        test("Should create config and start single container, if single container selected", async () => {
             mockContainerIds = await getMockContainerIds(1);
             stubQuickPick.resolves([{ label: 'Test', containerId: mockContainerIds[0] }] as any);
             const mockMessage = `Successfully Started Test`;
@@ -110,7 +118,7 @@ suite('Add Command Tests', async () => {
             assert.strictEqual(mockMessage, spyShowInformationMessageArgs);
         });
 
-        test("Should show quick pick, create config and start multiple containers", async () => {
+        test("Should create config and start multiple containers, if multiple containers selected", async () => {
             mockContainerIds = await getMockContainerIds(2);
             const mockListItems = mockContainerIds.map((containerId, index) => ({
                 label: `Test_${index + 1}`, containerId

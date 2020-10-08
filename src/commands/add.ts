@@ -16,7 +16,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
     });
 
     if (!availableContainerList.length) {
-        window.showInformationMessage(`No Containers Available`);
+        window.showWarningMessage(`No Containers Found`);
         return;
     }
 
@@ -31,7 +31,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
                 .includes(availableContainer.containerId));
 
         if (!newContainers.length) {
-            window.showInformationMessage(`All Available Containers Are Already Added`);
+            window.showWarningMessage(`All Available Containers Are Already Added To Workspace`);
             return;
         }
 
@@ -50,5 +50,8 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
         const containerIds = extractContainerIds([...containersToExtract, ...selection]);
         await writeConfig(containerIds);
         await ext.startOperation.operateContainers(selection);
+    } else {
+        window.showWarningMessage(`Please Select At least One Container To Add`);
+        return;
     }
 });
