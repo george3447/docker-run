@@ -73,18 +73,18 @@ suite('Stop Operation Tests', async () => {
         });
 
         test("Should show container not found message", async () => {
-            const spyShowErrorMessage = spy(window, "showErrorMessage");
+            const spyShowWarningMessage = spy(window, "showWarningMessage");
             const mockContainersList = (await getWorkspaceContainers(true))
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.stopOperation.operateContainers(mockContainersList);
 
             const mockMessage = `No Container With Given Container Id ${mockContainersList[0].containerId} Found`;
-            const spyShowErrorMessageArgs = spyShowErrorMessage.getCall(0).args[0];
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.ok(spyWithProgress.calledOnce);
-            assert.strictEqual(spyShowErrorMessage.callCount, mockContainersList.length);
-            assert.deepEqual(mockMessage, spyShowErrorMessageArgs);
-            spyShowErrorMessage.restore();
+            assert.strictEqual(spyShowWarningMessage.callCount, mockContainersList.length);
+            assert.deepEqual(mockMessage, spyShowWarningMessageArgs);
+            spyShowWarningMessage.restore();
         });
     });
 
@@ -130,18 +130,18 @@ suite('Stop Operation Tests', async () => {
         });
 
         test("Should show container not found message", async () => {
-            const spyShowErrorMessage = spy(window, "showErrorMessage");
+            const spyShowWarningMessage = spy(window, "showWarningMessage");
             const mockContainersList = (await getWorkspaceContainers(true))
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.stopOperation.operateContainers(mockContainersList);
 
             const mockMessages = mockContainersList.map(({ containerId }) => `No Container With Given Container Id ${containerId} Found`);
-            const spyShowErrorMessageArgs = spyShowErrorMessage.getCalls().map(({ args }) => args[0]);
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCalls().map(({ args }) => args[0]);
 
             assert.ok(spyWithProgress.calledOnce);
-            assert.strictEqual(spyShowErrorMessage.callCount, mockContainersList.length);
-            assert.deepEqual(mockMessages, spyShowErrorMessageArgs);
-            spyShowErrorMessage.restore();
+            assert.strictEqual(spyShowWarningMessage.callCount, mockContainersList.length);
+            assert.deepEqual(mockMessages, spyShowWarningMessageArgs);
+            spyShowWarningMessage.restore();
         });
     });
 });

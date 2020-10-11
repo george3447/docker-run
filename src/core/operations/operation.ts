@@ -21,7 +21,7 @@ export abstract class Operation {
 
     async abstract operate(container: Container, label?: string): Promise<void>;
 
-    async operateContainers(selection: ContainerList) {
+    async operateContainers(selection: ContainerList, isAll = false) {
         const { message: { progress } } = this.operationConfig;
         if (selection.length === 1) {
             const [containerListItem] = selection;
@@ -31,7 +31,10 @@ export abstract class Operation {
             }));
         }
         else {
-            const progressOptions = { location: ProgressLocation.Notification, title: `${progress} Selected Containers` };
+            const progressOptions = {
+                location: ProgressLocation.Notification,
+                title: `${progress} ${isAll ? 'All' : 'Selected'} Containers`
+            };
             await window.withProgress(progressOptions, (async (progress) => {
                 await this.operateContainersWithProgress(selection, progress);
             }));
@@ -59,7 +62,7 @@ export abstract class Operation {
         const isContainerExist = await isContainerExists(containerId);
 
         if (!isContainerExist) {
-            window.showErrorMessage(`No Container With Given Container Id ${containerId} Found`);
+            window.showWarningMessage(`No Container With Given Container Id ${containerId} Found`);
             return;
         }
 
