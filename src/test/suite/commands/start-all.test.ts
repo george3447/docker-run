@@ -7,7 +7,7 @@ import { getMockContainerIds, removeMockContainers } from '../../utils/container
 import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StartOperation } from '../../../core/operations';
-import { ContainerList, getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
+import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
 
 let mockContainerIds: Array<string> = [];
 
@@ -47,13 +47,13 @@ suite('Start All Command Tests', async () => {
 
     suite('With Single Container', async () => {
 
-        setup(async () => {
+        suiteSetup(async () => {
             mockContainerIds = await getMockContainerIds(1);
             await writeConfig(mockContainerIds);
         });
 
 
-        teardown(async () => {
+        suiteTeardown(async () => {
             await Promise.all([
                 removeMockContainers(mockContainerIds),
                 clearDockerrc()
@@ -97,13 +97,13 @@ suite('Start All Command Tests', async () => {
 
     suite('With Multiple Containers', async () => {
 
-        setup(async () => {
+        suiteSetup(async () => {
             mockContainerIds = await getMockContainerIds(3);
             await writeConfig(mockContainerIds);
 
         });
 
-        teardown(async () => {
+        suiteTeardown(async () => {
             await Promise.all([
                 removeMockContainers(mockContainerIds),
                 clearDockerrc()
