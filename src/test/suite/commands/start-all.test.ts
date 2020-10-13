@@ -1,4 +1,4 @@
-import { spy, SinonSpy, stub, SinonStub, restore } from 'sinon';
+import { spy, SinonSpy, restore } from 'sinon';
 import { expect, assert } from 'chai';
 import { window, commands } from 'vscode';
 

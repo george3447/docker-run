@@ -47,17 +47,19 @@ suite('Remove Command Tests', async () => {
 
     suite('With Containers In Config', async () => {
 
-        teardown(async () => {
+        suiteSetup(async () => {
+            mockContainerIds = await getMockContainerIds(3);
+            await writeConfig(mockContainerIds);
+        });
+
+        suiteTeardown(async () => {
             await removeMockContainers(mockContainerIds);
             await clearDockerrc();
             await setEmptyDockerrc();
         });
 
         test("Should show quick pick with available containers", async () => {
-            mockContainerIds = await getMockContainerIds(3);
-            await writeConfig(mockContainerIds);
             stubQuickPick.resolves([] as any);
-
             await commands.executeCommand('docker-run.remove');
             const stubQuickPickArgs = (stubQuickPick.getCall(0).args[0] as ContainerList).map(({ containerId }) => containerId);
             assert.ok(stubQuickPick.calledOnce);
@@ -66,8 +68,6 @@ suite('Remove Command Tests', async () => {
         });
 
         test("Should show 'select at least one container' warning message, if no container selected from quick pick", async () => {
-            mockContainerIds = await getMockContainerIds(3);
-            await writeConfig(mockContainerIds);
             stubQuickPick.resolves([] as any);
             const mockMessage = `Please Select At least One Container To Remove`;
 
@@ -77,10 +77,22 @@ suite('Remove Command Tests', async () => {
             assert.ok(stubQuickPick.calledOnce);
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
         });
+    });
 
-        test("Should remove single container and update config, if selected single container", async () => {
+    suite('With Containers', async () => {
+
+        setup(async () => {
             mockContainerIds = await getMockContainerIds(3);
             await writeConfig(mockContainerIds);
+        });
+
+        teardown(async () => {
+            await removeMockContainers(mockContainerIds);
+            await clearDockerrc();
+            await setEmptyDockerrc();
+        });
+
+        test("Should remove single container and update config, if selected single container", async () => {
             const [selectedContainer, ...remainingContainers] = mockContainerIds;
             await ext.dockerode.getContainer(selectedContainer).start();
             stubQuickPick.resolves([{ label: 'Test', containerId: selectedContainer }] as any);
@@ -96,7 +108,6 @@ suite('Remove Command Tests', async () => {
 
 
         test("Should remove multiple containers and update config, if multiple containers selected", async () => {
-            mockContainerIds = await getMockContainerIds(3);
             const remainingContainers = [mockContainerIds[0]];
             const selectedContainers = [mockContainerIds[1], mockContainerIds[2]];
             await Promise.all(selectedContainers
@@ -104,7 +115,6 @@ suite('Remove Command Tests', async () => {
             stubQuickPick.resolves(selectedContainers
                 .map((containerId, index) => ({ label: `Test_${index + 1}`, containerId })) as any);
 
-            await writeConfig(mockContainerIds);
             await commands.executeCommand('docker-run.remove');
 
             const availableContainers = await getConfig();
@@ -116,8 +126,6 @@ suite('Remove Command Tests', async () => {
         });
 
         test("Should remove all containers and update config as empty, if all containers selected", async () => {
-            mockContainerIds = await getMockContainerIds(3);
-            await writeConfig(mockContainerIds);
             stubQuickPick.resolves(mockContainerIds
                 .map(mockContainerId => ({ label: 'Test', containerId: mockContainerId }))
             );
