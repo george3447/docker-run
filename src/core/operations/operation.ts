@@ -1,40 +1,28 @@
-import { Progress, window, ProgressLocation } from "vscode";
+import { Progress, window, ProgressLocation, ProgressOptions } from "vscode";
 import { Container } from "dockerode";
 
 import { ContainerList, ContainerListItem, isContainerExists } from "../../common/list";
 import { ext } from "../ext-variables";
 
-export interface OperationConfig {
-    message: {
-        progress: string;
-        result: string;
-    }
-}
-
 export abstract class Operation {
 
-    private operationConfig: OperationConfig;
+    constructor() { }
 
-    constructor(operationConfig: OperationConfig) {
-        this.operationConfig = operationConfig;
-    }
-
+    abstract getProgressTitleForSingleContainer(label: string): string;
+    abstract getProgressTitleForMultipleContainers(isAll?: boolean): string;
     async abstract operate(container: Container, label?: string): Promise<void>;
 
     async operateContainers(selection: ContainerList, isAll = false) {
-        const { message: { progress } } = this.operationConfig;
+        const progressOptions: ProgressOptions = { location: ProgressLocation.Notification };
         if (selection.length === 1) {
             const [containerListItem] = selection;
-            const progressOptions = { location: ProgressLocation.Notification, title: `${progress} Container ${containerListItem.label}` };
+            progressOptions.title = this.getProgressTitleForSingleContainer(containerListItem.label);
             await window.withProgress(progressOptions, (async () => {
                 await this.operateContainer(containerListItem);
             }));
         }
         else {
-            const progressOptions = {
-                location: ProgressLocation.Notification,
-                title: `${progress} ${isAll ? 'All' : 'Selected'} Containers`
-            };
+            progressOptions.title = this.getProgressTitleForMultipleContainers(isAll);
             await window.withProgress(progressOptions, (async (progress) => {
                 await this.operateContainersWithProgress(selection, progress);
             }));
@@ -68,10 +56,5 @@ export abstract class Operation {
 
         const container = ext.dockerode.getContainer(containerId);
         await this.operate(container, label);
-    }
-
-    protected showMessage(label: string) {
-        const { message } = this.operationConfig;
-        window.showInformationMessage(`Successfully ${message.result} ${label}`);
     }
 }
