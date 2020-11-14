@@ -3,7 +3,7 @@ import { restore, SinonSpy, SinonStub, spy, stub } from "sinon";
 import { commands, window } from "vscode";
 
 import { writeConfig } from "../../../common/config";
-import { ContainerList } from "../../../common/list";
+import { ContainerList, getWorkspaceContainers } from "../../../common/list";
 import { ext } from "../../../core/ext-variables";
 import { StartOperation } from "../../../core/operations";
 import { clearDockerrc, setEmptyDockerrc } from "../../utils/common";
@@ -88,7 +88,7 @@ suite('Start Command Tests', () => {
             const mockMessage = `Please Select At least One Container To Start`;
 
             await commands.executeCommand('docker-run.start');
-            
+
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
             assert.ok(stubQuickPick.calledOnce);
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
@@ -98,22 +98,27 @@ suite('Start Command Tests', () => {
         test("Should start single container, if single container selected", async () => {
             mockContainerIds = await getMockContainerIds(1);
             await writeConfig(mockContainerIds);
+            const mockContainersList = await getWorkspaceContainers(true);
             stubQuickPick.resolves([{ label: 'Test', containerId: mockContainerIds[0] }] as any);
             const mockMessage = `Successfully Started Test`;
 
             await commands.executeCommand('docker-run.start');
 
+            const startedContainers = await getWorkspaceContainers(false, true);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
 
             assert.ok(stubQuickPick.calledOnce);
             assert.ok(spyWithProgress.calledAfter(stubQuickPick));
             assert.ok(spyShowInformationMessage.calledAfter(spyWithProgress));
             assert.strictEqual(mockMessage, spyShowInformationMessageArgs);
+            expect(startedContainers).to.have.deep.members(mockContainersList);
         });
 
         test("Should start multiple containers, if multiple containers selected", async () => {
             mockContainerIds = await getMockContainerIds(3);
             await writeConfig(mockContainerIds);
+
+            const mockContainersList = await getWorkspaceContainers(true);
             const mockListItems = mockContainerIds.map((containerId, index) => ({
                 label: `Test_${index + 1}`, containerId
             }));
@@ -122,6 +127,7 @@ suite('Start Command Tests', () => {
 
             await commands.executeCommand('docker-run.start');
 
+            const startedContainers = await getWorkspaceContainers(false, true);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
 
             assert.ok(stubQuickPick.calledOnce);
@@ -129,6 +135,7 @@ suite('Start Command Tests', () => {
             assert.ok(spyShowInformationMessage.calledAfter(spyWithProgress));
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainerIds.length);
             expect(mockMessages).to.have.deep.members(spyShowInformationMessageArgs);
+            expect(startedContainers).to.have.deep.members(mockContainersList);
         });
     });
 

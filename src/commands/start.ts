@@ -1,6 +1,6 @@
 import { commands, window } from "vscode";
 
-import { ContainerList, getWorkspaceContainers } from "../common/list";
+import { getWorkspaceContainers } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
