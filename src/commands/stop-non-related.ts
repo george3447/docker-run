@@ -5,25 +5,26 @@ import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
 export const disposableStopNonRelated = commands.registerCommand('docker-run.stop:non-related', async () => {
-    const progressOptions = { location: ProgressLocation.Notification, title: 'Stopping Non Related Containers' };
 
-    window.withProgress(progressOptions, (async (progress) => {
+    const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
+        handleError(error);
+        return [] as ContainerList;
+    });
 
-        const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
-            handleError(error);
-            return [] as ContainerList;
-        });
+    const allContainers = await getGlobalContainers(true).catch((error: Error) => {
+        handleError(error);
+        return [] as ContainerList;
+    });
 
-        const allRunningContainer = await getGlobalContainers(false, true).catch((error: Error) => {
-            handleError(error);
-            return [] as ContainerList;
-        });
-        
-        const nonRelatedContainers = allRunningContainer.filter(runningContainer =>
-            !containerList.map(container => container.containerId)
-                .includes(runningContainer.containerId));
-        if (nonRelatedContainers.length) {
-            ext.stopNonRelatedOperation.operateContainersWithProgress(nonRelatedContainers, progress);
-        }
-    }));
+    const nonRelatedContainers = allContainers.filter(runningContainer =>
+        !containerList.map(container => container.containerId)
+            .includes(runningContainer.containerId));
+
+    if (!nonRelatedContainers.length) {
+        window.showWarningMessage('No non related container found');
+        return;
+    }
+
+    await ext.stopNonRelatedOperation.operateContainers(nonRelatedContainers);
+
 });

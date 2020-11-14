@@ -1,8 +1,6 @@
 import Dockerode = require("dockerode");
 
-import { StartOperation } from "./operations/start-operation";
-import { StopOperation } from "./operations/stop-operation";
-import { StopNonRelatedOperation } from "./operations/stop-non-related-operation";
+import { StartOperation, StopOperation, StopNonRelatedOperation } from "./operations";
 
 export namespace ext {
     export let dockerode: Dockerode;
