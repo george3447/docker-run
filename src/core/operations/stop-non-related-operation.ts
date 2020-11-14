@@ -1,15 +1,19 @@
 import { Container } from "dockerode";
+import { window } from "vscode";
 
 import { Operation } from "./operation";
 
 export class StopNonRelatedOperation extends Operation {
     constructor() {
-        super({
-            message: {
-                progress: 'Stopping Non Related',
-                result: 'Stopped Non Related Container'
-            }
-        });
+        super();
+    }
+
+    getProgressTitleForSingleContainer(label: string) {
+        return `Stopping Non Related Container ${label}`;
+    }
+
+    getProgressTitleForMultipleContainers() {
+        return `Stopping Non Related Containers`;
     }
 
     async operate(container: Container, label: string) {
@@ -22,6 +26,6 @@ export class StopNonRelatedOperation extends Operation {
         }
 
         await container.stop();
-        this.showMessage(label);
+        window.showInformationMessage(`Successfully Stopped Non Related Container ${label}`);
     }
 }

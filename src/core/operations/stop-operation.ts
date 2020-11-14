@@ -1,15 +1,19 @@
 import { Container } from "dockerode";
+import { window } from "vscode";
 
 import { Operation } from "./operation";
 
 export class StopOperation extends Operation {
     constructor() {
-        super({
-            message: {
-                progress: 'Stopping',
-                result: 'Stopped'
-            }
-        });
+        super();
+    }
+
+    getProgressTitleForSingleContainer(label: string) {
+        return `Stopping Container ${label}`;
+    }
+
+    getProgressTitleForMultipleContainers(isAll: boolean) {
+        return `Stopping ${isAll ? 'All' : 'Selected'} Containers`;
     }
 
     async operate(container: Container, label: string) {
@@ -22,6 +26,6 @@ export class StopOperation extends Operation {
         }
 
         await container.stop();
-        this.showMessage(label);
+        window.showInformationMessage(`Successfully Stopped ${label}`);
     }
 }

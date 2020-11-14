@@ -7,7 +7,7 @@ import { getMockContainerIds, removeMockContainers } from '../../utils/container
 import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StopNonRelatedOperation } from '../../../core/operations';
-import { getAllContainersList, getContainersList } from '../../../common/list';
+import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
 
 let mockContainerIds: Array<string> = [];
 
@@ -47,13 +47,13 @@ suite('Stop Non Related Operation Tests', async () => {
 
         test("Should stop the container", async () => {
 
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.dockerode.getContainer(mockContainersList[0].containerId).start();
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
             const mockMessage = `Successfully Stopped Non Related Container ${mockContainersList[0].label}`;
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
-            const stoppedContainers = await getAllContainersList(false, false);
+            const stoppedContainers = await getGlobalContainers(false, false);
 
             assert.ok(spyWithProgress.calledOnce);
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
@@ -63,27 +63,27 @@ suite('Stop Non Related Operation Tests', async () => {
 
         test("Should show only progress, if container already stopped", async () => {
 
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
-            const stoppedContainers = await getAllContainersList(false, false);
+            const stoppedContainers = await getGlobalContainers(false, false);
             assert.ok(spyWithProgress.calledOnce);
             expect(stoppedContainers).to.have.deep.members(mockContainersList);
         });
 
         test("Should show container not found message", async () => {
-            const spyShowErrorMessage = spy(window, "showErrorMessage");
-            const mockContainersList = (await getContainersList(true))
+            const spyShowWarningMessage = spy(window, "showWarningMessage");
+            const mockContainersList = (await getWorkspaceContainers(true))
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
             const mockMessage = `No Container With Given Container Id ${mockContainersList[0].containerId} Found`;
-            const spyShowErrorMessageArgs = spyShowErrorMessage.getCall(0).args[0];
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.ok(spyWithProgress.calledOnce);
-            assert.strictEqual(spyShowErrorMessage.callCount, mockContainersList.length);
-            assert.deepEqual(mockMessage, spyShowErrorMessageArgs);
-            spyShowErrorMessage.restore();
+            assert.strictEqual(spyShowWarningMessage.callCount, mockContainersList.length);
+            assert.deepEqual(mockMessage, spyShowWarningMessageArgs);
+            spyShowWarningMessage.restore();
         });
     });
 
@@ -104,13 +104,13 @@ suite('Stop Non Related Operation Tests', async () => {
 
         test("Should stop all containers", async () => {
 
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
             const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped Non Related Container ${label}`);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
-            const stoppedContainers = await getAllContainersList(false, false);
+            const stoppedContainers = await getGlobalContainers(false, false);
 
             assert.ok(spyWithProgress.calledOnce);
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
@@ -120,27 +120,27 @@ suite('Stop Non Related Operation Tests', async () => {
 
         test("Should show only progress, if containers already stopped", async () => {
 
-            const mockContainersList = await getContainersList(true);
+            const mockContainersList = await getWorkspaceContainers(true);
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
-            const stoppedContainers = await getAllContainersList(false, false);
+            const stoppedContainers = await getGlobalContainers(false, false);
             assert.ok(spyWithProgress.calledOnce);
             expect(stoppedContainers).to.have.deep.members(mockContainersList);
         });
 
         test("Should show container not found message", async () => {
-            const spyShowErrorMessage = spy(window, "showErrorMessage");
-            const mockContainersList = (await getContainersList(true))
+            const spyShowWarningMessage = spy(window, "showWarningMessage");
+            const mockContainersList = (await getWorkspaceContainers(true))
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
             const mockMessages = mockContainersList.map(({ containerId }) => `No Container With Given Container Id ${containerId} Found`);
-            const spyShowErrorMessageArgs = spyShowErrorMessage.getCalls().map(({ args }) => args[0]);
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCalls().map(({ args }) => args[0]);
 
             assert.ok(spyWithProgress.calledOnce);
-            assert.strictEqual(spyShowErrorMessage.callCount, mockContainersList.length);
-            assert.deepEqual(mockMessages, spyShowErrorMessageArgs);
-            spyShowErrorMessage.restore();
+            assert.strictEqual(spyShowWarningMessage.callCount, mockContainersList.length);
+            assert.deepEqual(mockMessages, spyShowWarningMessageArgs);
+            spyShowWarningMessage.restore();
         });
     });
 });

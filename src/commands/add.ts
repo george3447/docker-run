@@ -1,35 +1,27 @@
 import { commands, window } from "vscode";
 
-import { getAllContainersList, getContainersList, ContainerList, extractContainerIds } from "../common/list";
+import { getGlobalContainers, getWorkspaceContainers, ContainerList, extractContainerIds } from "../common/list";
 import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
 
 export const disposableAdd = commands.registerCommand('docker-run.add', async (createConfigFile?: boolean) => {
-    const availableContainerList = await getAllContainersList(true).catch((error: Error) => {
+
+    let quickPickList: ContainerList;
+    let containersToExtract: ContainerList = [];
+
+    const availableContainerList = await getGlobalContainers(true).catch((error: Error) => {
         handleError(error);
         return [] as ContainerList;
     });
 
     if (!availableContainerList.length) {
-        return window.showInformationMessage(`No Containers Available`);
+        window.showWarningMessage(`No Containers Found`);
+        return;
     }
 
-    if (createConfigFile) {
-
-        const selection = await window.showQuickPick(availableContainerList, {
-            canPickMany: true,
-            placeHolder: 'Select Containers That You Need For This Workspace'
-        });
-
-        if (selection && selection.length > 0) {
-            const containerIds = extractContainerIds(selection);
-            await writeConfig(containerIds);
-            await ext.startOperation.operateContainers(selection);
-        }
-
-    } else {
-        const containerList = await getContainersList(true).catch((error: Error) => {
+    if (!createConfigFile) {
+        const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
             handleError(error);
             return [] as ContainerList;
         });
@@ -39,18 +31,27 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
                 .includes(availableContainer.containerId));
 
         if (!newContainers.length) {
-            return window.showInformationMessage(`All Available Containers Are Already Added`);
+            window.showWarningMessage(`All Available Containers Are Already Added To Workspace`);
+            return;
         }
 
-        const selection = await window.showQuickPick(newContainers, {
-            canPickMany: true,
-            placeHolder: 'Select Containers You Need For This Workspace'
-        });
+        quickPickList = newContainers;
+        containersToExtract = containerList;
+    } else {
+        quickPickList = availableContainerList;
+    }
 
-        if (selection && selection.length > 0) {
-            const containerIds = extractContainerIds([...containerList, ...selection]);
-            await writeConfig(containerIds);
-            await ext.startOperation.operateContainers(selection);
-        }
+    const selection = await window.showQuickPick(quickPickList, {
+        canPickMany: true,
+        placeHolder: 'Select Containers That You Need For This Workspace'
+    });
+
+    if (selection && selection.length > 0) {
+        const containerIds = extractContainerIds([...containersToExtract, ...selection]);
+        await writeConfig(containerIds);
+        await ext.startOperation.operateContainers(selection);
+    } else {
+        window.showWarningMessage(`Please Select At least One Container To Add`);
+        return;
     }
 });

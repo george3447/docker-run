@@ -5,12 +5,15 @@ import { Operation } from "./operation";
 
 export class StartOperation extends Operation {
     constructor() {
-        super({
-            message: {
-                progress: 'Starting',
-                result: 'Started'
-            }
-        });
+        super();
+    }
+
+    getProgressTitleForSingleContainer(label: string) {
+        return `Starting Container ${label}`;
+    }
+
+    getProgressTitleForMultipleContainers(isAll: boolean) {
+        return `Starting ${isAll ? 'All' : 'Selected'} Containers`;
     }
 
     async operate(container: Container, label: string) {
@@ -23,6 +26,6 @@ export class StartOperation extends Operation {
         }
 
         await container.start();
-        this.showMessage(label);
+        window.showInformationMessage(`Successfully Started ${label}`);
     }
 }

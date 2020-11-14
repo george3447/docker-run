@@ -1,6 +1,6 @@
-import { spy, SinonSpy } from 'sinon';
+import { spy, SinonSpy, restore } from 'sinon';
 import { expect, assert } from 'chai';
-import { window } from 'vscode';
+import { window, commands } from 'vscode';
 
 import { writeConfig } from '../../../common/config';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
@@ -11,30 +11,46 @@ import { getGlobalContainers, getWorkspaceContainers } from '../../../common/lis
 
 let mockContainerIds: Array<string> = [];
 
-suite('Stop Operation Tests', async () => {
+suite('Stop All Command Tests', async () => {
 
     let spyShowInformationMessage: SinonSpy;
     let spyWithProgress: SinonSpy;
+    let spyShowWarningMessage: SinonSpy;
 
     suiteSetup(async () => {
         ext.stopOperation = new StopOperation();
     });
 
     setup(async () => {
+        spyShowWarningMessage = spy(window, 'showWarningMessage');
         spyShowInformationMessage = spy(window, "showInformationMessage");
         spyWithProgress = spy(window, "withProgress");
     });
 
     teardown(async () => {
-        spyShowInformationMessage.restore();
-        spyWithProgress.restore();
+        restore();
     });
+
+
+    suite('With No Available Container', async () => {
+
+        test("Should show no container found message", async () => {
+            await commands.executeCommand('docker-run.stop:all');
+            const mockMessage = `No Containers Found For This Workspace`;
+            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
+
+            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
+        });
+    });
+
+
 
     suite('With Single Container', async () => {
 
         suiteSetup(async () => {
             mockContainerIds = await getMockContainerIds(1);
             await writeConfig(mockContainerIds);
+            await ext.dockerode.getContainer(mockContainerIds[0]).start();
         });
 
 
@@ -47,10 +63,8 @@ suite('Stop Operation Tests', async () => {
         });
 
         test("Should stop the container", async () => {
-
             const mockContainersList = await getWorkspaceContainers(true);
-            await ext.dockerode.getContainer(mockContainersList[0].containerId).start();
-            await ext.stopOperation.operateContainers(mockContainersList);
+            await commands.executeCommand('docker-run.stop:all');
 
             const mockMessage = `Successfully Stopped ${mockContainersList[0].label}`;
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
@@ -62,29 +76,10 @@ suite('Stop Operation Tests', async () => {
             expect(stoppedContainers).to.have.deep.members(mockContainersList);
         });
 
-        test("Should show only progress, if container already stopped", async () => {
-
-            const mockContainersList = await getWorkspaceContainers(true);
-            await ext.stopOperation.operateContainers(mockContainersList);
-
-            const stoppedContainers = await getGlobalContainers(false, false);
+        test("Should not show any message and exit silently, if container already stopped", async () => {
+            await commands.executeCommand('docker-run.stop:all');
             assert.ok(spyWithProgress.calledOnce);
-            expect(stoppedContainers).to.have.deep.members(mockContainersList);
-        });
-
-        test("Should show container not found message", async () => {
-            const spyShowWarningMessage = spy(window, "showWarningMessage");
-            const mockContainersList = (await getWorkspaceContainers(true))
-                .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
-            await ext.stopOperation.operateContainers(mockContainersList);
-
-            const mockMessage = `No Container With Given Container Id ${mockContainersList[0].containerId} Found`;
-            const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
-
-            assert.ok(spyWithProgress.calledOnce);
-            assert.strictEqual(spyShowWarningMessage.callCount, mockContainersList.length);
-            assert.deepEqual(mockMessage, spyShowWarningMessageArgs);
-            spyShowWarningMessage.restore();
+            assert.ok(spyShowInformationMessage.notCalled);
         });
     });
 
@@ -93,6 +88,7 @@ suite('Stop Operation Tests', async () => {
         suiteSetup(async () => {
             mockContainerIds = await getMockContainerIds(3);
             await writeConfig(mockContainerIds);
+            await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
         });
 
         suiteTeardown(async () => {
@@ -106,8 +102,7 @@ suite('Stop Operation Tests', async () => {
         test("Should stop all containers", async () => {
 
             const mockContainersList = await getWorkspaceContainers(true);
-            await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
-            await ext.stopOperation.operateContainers(mockContainersList);
+            await commands.executeCommand('docker-run.stop:all');
 
             const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped ${label}`);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
@@ -117,31 +112,36 @@ suite('Stop Operation Tests', async () => {
             assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
             assert.deepEqual(mockMessages, spyShowInformationMessageArgs);
             expect(stoppedContainers).to.have.deep.members(mockContainersList);
+
+            await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
         });
 
-        test("Should show only progress, if containers already stopped", async () => {
+        test("Should show progress message as 'Stopping All Containers'", async () => {
 
             const mockContainersList = await getWorkspaceContainers(true);
-            await ext.stopOperation.operateContainers(mockContainersList);
+            await commands.executeCommand('docker-run.stop:all');
 
+            const mockProgressMessage = `Stopping All Containers`;
+            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped ${label}`);
+            const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
+
             assert.ok(spyWithProgress.calledOnce);
+            assert.strictEqual(mockProgressMessage, spyWithProgress.getCall(0).args[0].title);
+            assert.strictEqual(spyShowInformationMessage.callCount, mockContainersList.length);
+            assert.deepEqual(mockMessages, spyShowInformationMessageArgs);
             expect(stoppedContainers).to.have.deep.members(mockContainersList);
+
+            await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
         });
 
-        test("Should show container not found message", async () => {
-            const spyShowWarningMessage = spy(window, "showWarningMessage");
-            const mockContainersList = (await getWorkspaceContainers(true))
-                .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
-            await ext.stopOperation.operateContainers(mockContainersList);
-
-            const mockMessages = mockContainersList.map(({ containerId }) => `No Container With Given Container Id ${containerId} Found`);
-            const spyShowWarningMessageArgs = spyShowWarningMessage.getCalls().map(({ args }) => args[0]);
+        test("Should not show any message and exit silently, if container already stopped", async () => {
+            await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).stop()));
+            await commands.executeCommand('docker-run.stop:all');
 
             assert.ok(spyWithProgress.calledOnce);
-            assert.strictEqual(spyShowWarningMessage.callCount, mockContainersList.length);
-            assert.deepEqual(mockMessages, spyShowWarningMessageArgs);
-            spyShowWarningMessage.restore();
+            assert.ok(spyShowInformationMessage.notCalled);
+
         });
     });
 });

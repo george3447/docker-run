@@ -15,20 +15,20 @@ export function extractContainerIds(containerList: ContainerList) {
     return containerList.map(containerListItem => containerListItem.containerId);
 }
 
-export async function getContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
+export async function getWorkspaceContainers(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containers: Array<string> = await getConfig().catch((error: EmptyConfigError) => {
         error.setFileName("Docker Utils");
         throw error;
     });
-    return await getContainerListByContainerIdsAndStatus(containers, isAll, isRunning);
+    return await mapContainersWithLabel(containers, isAll, isRunning);
 }
 
-export async function getAllContainersList(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
+export async function getGlobalContainers(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containers = await ext.dockerode.listContainers({ all: true });
     if (!containers || !containers.length) {
         throw new NoContainersFoundError();
     }
-    return getContainerListByContainerIdsAndStatus(containers.map(container => container.Id.substring(0, 12)), isAll, isRunning);
+    return mapContainersWithLabel(containers.map(container => container.Id.substring(0, 12)), isAll, isRunning);
 }
 
 export async function isContainerExists(containerId: string): Promise<boolean> {
@@ -39,7 +39,7 @@ export async function isContainerExists(containerId: string): Promise<boolean> {
     return containers.findIndex(container => container.Id.substring(0, 12) === containerId) > -1;
 }
 
-async function getContainerListByContainerIdsAndStatus(containers: string[], isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
+async function mapContainersWithLabel(containers: string[], isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
     const containersList = [];
     for (let i = 0; i < containers.length; i++) {
 
