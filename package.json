@@ -93,7 +93,7 @@
   "scripts": {
     "deploy": "vsce publish --yarn",
     "lint": "eslint src --ext ts",
-    "pretest": "npm run test-compile && npm run lint &&  npx npe main ./out/extension",
+    "pretest": "npm run test-compile && npm run lint && npx npe main ./out/extension",
     "test": "node ./out/test/runTest.js",
     "posttest": "npx npe main ./dist/extension",
     "test-compile": "tsc -p ./",
