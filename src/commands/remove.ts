@@ -26,8 +26,8 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
             .filter(({ containerId }) => selection
                 .findIndex((selectedItem) => selectedItem.containerId === containerId) < 0));
 
-        await writeConfig(containerIds);
         await ext.stopOperation.operateContainers(selection);
+        await writeConfig(containerIds);
     } else {
         window.showWarningMessage(`Please Select At least One Container To Remove`);
         return;
