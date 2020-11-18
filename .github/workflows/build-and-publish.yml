@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - fix/test-cases
   release:
     types:
       - created

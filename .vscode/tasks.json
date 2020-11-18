@@ -6,7 +6,10 @@
     {
       "type": "npm",
       "script": "webpack-dev",
-      "problemMatcher": ["$ts-webpack-watch", "$ts-checker-eslint-webpack-watch"],
+      "problemMatcher": [
+        "$ts-webpack-watch",
+        "$ts-checker-eslint-webpack-watch"
+      ],
       "isBackground": true,
       "presentation": {
         "reveal": "never"
@@ -15,6 +18,24 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "pretest",
+      "type": "shell",
+      "command": "npx",
+      "args": ["npe", "main", "./out/extension"]
+    },
+    {
+      "label": "test-compile",
+      "type": "npm",
+      "script": "test-compile",
+      "dependsOn": ["pretest"]
+    },
+    {
+      "label": "posttest",
+      "type": "shell",
+      "command": "npx",
+      "args": ["npe", "main", "./dist/extension"]
     }
   ]
 }
