@@ -3,7 +3,7 @@ import { window, extensions } from 'vscode';
 
 import { writeConfig, getConfig } from '../../../common/config';
 import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../../common/error';
-import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
+import { clearDockerrc, isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
 
 const mockContainerIds = ["asd123asd123", "123asd123asd123asd"];
 
@@ -14,15 +14,18 @@ suite('Config Tests', async () => {
 		assert.equal(started, true);
 	});
 
-	test("Should get no dockerrc found error", async () => {
-		await clearDockerrc();
-		await assert.rejects(async () => await getConfig(), new DockerrcNotFoundError());
-	});
+	if (!isDockerrcDisabled()) {
 
-	test("Should get empty config file error", async () => {
-		await setEmptyDockerrc();
-		await assert.rejects(async () => await getConfig(), new EmptyConfigFileError());
-	});
+		test("Should get no dockerrc found error", async () => {
+			await clearDockerrc();
+			await assert.rejects(async () => await getConfig(), new DockerrcNotFoundError());
+		});
+
+		test("Should get empty config file error", async () => {
+			await setEmptyDockerrc();
+			await assert.rejects(async () => await getConfig(), new EmptyConfigFileError());
+		});
+	}
 
 	test("Should get empty config array error", async () => {
 		await writeConfig([]);

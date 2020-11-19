@@ -12,7 +12,9 @@ async function main() {
 		// Passed to --extensionTestsPath
 		const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
-		const launchArgs = [path.resolve(__dirname, '../../src/test/workspace'), '--disable-extensions'];
+		const workspaceFolder = process.env.WORKSPACE_FOLDER || 'workspace';
+
+		const launchArgs = [path.resolve(__dirname, `../../src/test/${workspaceFolder}`), '--disable-extensions'];
 
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs });

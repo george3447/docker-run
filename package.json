@@ -56,6 +56,16 @@
           "type": "boolean",
           "default": false,
           "description": "Disable automatic stopping of Non Related Containers"
+        },
+        "DockerRun.DisableDockerrc": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable writing container ids to .dockerrc file"
+        },
+        "DockerRun.Containers": {
+          "type": "array",
+          "default": [],
+          "description": "Container ids to start when workspace open"
         }
       }
     },
@@ -95,6 +105,7 @@
     "lint": "eslint src --ext ts",
     "pretest": "npm run test-compile && npm run lint && npx npe main ./out/extension",
     "test": "node ./out/test/runTest.js",
+    "test:v1": "WORKSPACE_FOLDER=workspace-v1 npm test",
     "posttest": "npx npe main ./dist/extension",
     "test-compile": "tsc -p ./",
     "vscode:prepublish": "webpack --mode=production",

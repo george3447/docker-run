@@ -6,7 +6,9 @@ export const CONFIGURATION_KEY = 'DockerRun';
 export const CONFIGURATION = {
     SECTION: 'DockerRun',
     DISABLE_AUTO_GENERATE_CONFIG: 'DisableAutoGenerateConfig',
-    DISABLE_AUTO_STOP_NON_RELATED: 'DisableAutoStopNonRelated'
+    DISABLE_AUTO_STOP_NON_RELATED: 'DisableAutoStopNonRelated',
+    DISABLE_DOCKERRC: 'DisableDockerrc',
+    CONTAINERS: 'Containers'
 };
 
 export enum AutoAdd {

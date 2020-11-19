@@ -1,7 +1,7 @@
 import { ExtensionContext, commands } from 'vscode';
 
 import { initDockerode, initContainerOperations, initAutoAdd, initAutoStart } from './core/core';
-import { isConfigAvailable } from './common/config';
+import { isConfigAvailable, isDockerrcDisabled } from './common/config';
 import { disposableAdd } from './commands/add';
 import { disposableRemove } from './commands/remove';
 import { disposableStartAll } from './commands/start-all';
@@ -28,7 +28,7 @@ export async function activate(context: ExtensionContext) {
 			disposableStop
 		);
 
-	if (!isConfigAvailable()) {
+	if (!isConfigAvailable() && !isDockerrcDisabled()) {
 		await initAutoAdd().catch(handleError);
 	} else {
 		await initAutoStart().catch(handleError);

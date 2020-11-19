@@ -15,6 +15,22 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
+      "name": "Extension Tests V1",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+        "--launchArgs",
+        "${workspaceFolder}/src/test/workspace-v1",
+        "--disable-extensions"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "test-compile",
+      "postDebugTask": "posttest"
+    },
+    {
       "name": "Extension Tests",
       "type": "extensionHost",
       "request": "launch",
