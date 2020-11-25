@@ -21,6 +21,10 @@ export function getFileUri() {
 }
 
 export function isConfigAvailable() {
+    if (isDockerrcDisabled()) {
+        const containers = getConfiguration(CONFIGURATION.CONTAINERS);
+        return containers !== null;
+    }
     return !!getFileUri();
 }
 

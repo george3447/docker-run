@@ -28,7 +28,7 @@ export async function activate(context: ExtensionContext) {
 			disposableStop
 		);
 
-	if (!isConfigAvailable() && !isDockerrcDisabled()) {
+	if (!isConfigAvailable()) {
 		await initAutoAdd().catch(handleError);
 	} else {
 		await initAutoStart().catch(handleError);
