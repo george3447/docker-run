@@ -8,6 +8,7 @@ import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StartOperation } from '../../../core/operations';
 import { ContainerList } from '../../../common/list';
+import * as messages from '../../../common/messages';
 
 let mockContainerIds: Array<string> = [];
 
@@ -38,10 +39,9 @@ suite('Add Command Tests', async () => {
 
         test("Should show no container found message", async () => {
             await commands.executeCommand('docker-run.add');
-            const mockMessage = `No Containers Found`;
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
-            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
+            assert.strictEqual(messages.NO_CONTAINERS_FOUND, spyShowWarningMessageArgs);
         });
     });
 
@@ -56,15 +56,14 @@ suite('Add Command Tests', async () => {
         });
 
 
-        test("Should show message, if no container left to add", async () => {
+        test(`Should show message '${messages.ALREADY_ADDED_TO_WORKSPACE}', if no container left to add`, async () => {
             mockContainerIds = await getMockContainerIds(1);
             await writeConfig(mockContainerIds);
 
             await commands.executeCommand('docker-run.add');
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
-            const mockMessage = `All Available Containers Are Already Added To Workspace`;
             assert.ok(spyShowWarningMessage.calledOnce);
-            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
+            assert.strictEqual(messages.ALREADY_ADDED_TO_WORKSPACE, spyShowWarningMessageArgs);
         });
 
         test("Should show quick pick with available containers, if no config file available", async () => {
@@ -91,22 +90,21 @@ suite('Add Command Tests', async () => {
         });
 
 
-        test("Should show 'select at least one container' warning message, if no container selected", async () => {
+        test(`Should show '${messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_ADD}' warning message, if no container selected`, async () => {
             mockContainerIds = await getMockContainerIds(3);
             stubQuickPick.resolves([] as any);
-            const mockMessage = `Please Select At least One Container To Add`;
 
             await commands.executeCommand('docker-run.add');
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.ok(stubQuickPick.calledOnce);
-            assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
+            assert.strictEqual(messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_ADD, spyShowWarningMessageArgs);
         });
 
         test("Should create config and start single container, if single container selected", async () => {
             mockContainerIds = await getMockContainerIds(1);
             stubQuickPick.resolves([{ label: 'Test', containerId: mockContainerIds[0] }] as any);
-            const mockMessage = `Successfully Started Test`;
+            const mockMessage = messages.SUCCESSFULLY_STARTED_CONTAINER('Test');
 
             await commands.executeCommand('docker-run.add', true);
 
@@ -124,7 +122,7 @@ suite('Add Command Tests', async () => {
                 label: `Test_${index + 1}`, containerId
             }));
             stubQuickPick.resolves(mockListItems as any);
-            const mockMessages = mockListItems.map(({ label }) => `Successfully Started ${label}`);
+            const mockMessages = mockListItems.map(({ label }) => messages.SUCCESSFULLY_STARTED_CONTAINER(label));
 
             await commands.executeCommand('docker-run.add', true);
 

@@ -3,6 +3,7 @@ import { commands, window } from "vscode";
 import { getWorkspaceContainers } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
+import * as messages from "../common/messages";
 
 export const disposableStart = commands.registerCommand('docker-run.start', async () => {
 
@@ -12,12 +13,12 @@ export const disposableStart = commands.registerCommand('docker-run.start', asyn
     });
 
     if (!stoppedContainerList) {
-        window.showWarningMessage(`Please Add At Least One Container To Workspace`);
+        window.showWarningMessage(messages.ADD_AT_LEAST_ONE_CONTAINER_TO_WORKSPACE);
         return;
     }
 
     if (!stoppedContainerList.length) {
-        window.showWarningMessage(`All Containers For Current Workspace Are Running`);
+        window.showWarningMessage(messages.ALL_CONTAINERS_ARE_RUNNING);
         return;
     }
 
@@ -25,7 +26,7 @@ export const disposableStart = commands.registerCommand('docker-run.start', asyn
     if (selection && selection.length > 0) {
         await ext.startOperation.operateContainers(selection);
     } else {
-        window.showWarningMessage(`Please Select At least One Container To Start`);
+        window.showWarningMessage(messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_START);
         return;
     }
 

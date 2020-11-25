@@ -8,6 +8,7 @@ import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StopOperation } from '../../../core/operations';
 import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
+import * as messages from '../../../common/messages';
 
 let mockContainerIds: Array<string> = [];
 
@@ -78,7 +79,7 @@ suite('Stop Operation Tests', async () => {
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.stopOperation.operateContainers(mockContainersList);
 
-            const mockMessage = `No Container With Given Container Id ${mockContainersList[0].containerId} Found`;
+            const mockMessage = messages.NO_CONTAINER_WITH_CONTAINER_ID_FOUND(mockContainersList[0].containerId);
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.ok(spyWithProgress.calledOnce);
@@ -135,7 +136,7 @@ suite('Stop Operation Tests', async () => {
                 .map((mockContainer, index) => ({ ...mockContainer, containerId: (mockContainer.containerId + index) }));
             await ext.stopOperation.operateContainers(mockContainersList);
 
-            const mockMessages = mockContainersList.map(({ containerId }) => `No Container With Given Container Id ${containerId} Found`);
+            const mockMessages = mockContainersList.map(({ containerId }) => messages.NO_CONTAINER_WITH_CONTAINER_ID_FOUND(containerId));
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCalls().map(({ args }) => args[0]);
 
             assert.ok(spyWithProgress.calledOnce);

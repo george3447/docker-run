@@ -4,6 +4,7 @@ import { getWorkspaceContainers, ContainerList, extractContainerIds } from "../c
 import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
+import * as messages from "../common/messages";
 
 export const disposableRemove = commands.registerCommand('docker-run.remove', async () => {
     const containerList = await getWorkspaceContainers(true).catch((error: Error) => {
@@ -12,13 +13,13 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
     });
 
     if (!containerList.length) {
-        window.showWarningMessage(`Please Add At least One Container To Workspace`);
+        window.showWarningMessage(messages.ADD_AT_LEAST_ONE_CONTAINER_TO_WORKSPACE);
         return;
     }
 
     const selection = await window.showQuickPick(containerList, {
         canPickMany: true,
-        placeHolder: 'Select Containers You Need To Remove From This Workspace'
+        placeHolder: messages.SELECT_CONTAINERS_TO_REMOVE
     });
 
     if (selection && selection.length > 0) {
@@ -29,7 +30,7 @@ export const disposableRemove = commands.registerCommand('docker-run.remove', as
         await ext.stopOperation.operateContainers(selection);
         await writeConfig(containerIds);
     } else {
-        window.showWarningMessage(`Please Select At least One Container To Remove`);
+        window.showWarningMessage(messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_REMOVE);
         return;
     }
 

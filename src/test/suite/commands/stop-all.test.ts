@@ -8,6 +8,7 @@ import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StopOperation } from '../../../core/operations';
 import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
+import * as messages from '../../../common/messages';
 
 let mockContainerIds: Array<string> = [];
 
@@ -36,7 +37,7 @@ suite('Stop All Command Tests', async () => {
 
         test("Should show no container found message", async () => {
             await commands.executeCommand('docker-run.stop:all');
-            const mockMessage = `No Containers Found For This Workspace`;
+            const mockMessage = messages.NO_CONTAINERS_FOUND_FOR_THIS_WORKSPACE;
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);

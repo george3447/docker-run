@@ -6,6 +6,7 @@ import { getMockContainerIds, removeMockContainers } from '../../utils/container
 import { ext } from '../../../core/ext-variables';
 import { StopNonRelatedOperation } from '../../../core/operations';
 import { getGlobalContainers } from '../../../common/list';
+import * as messages from '../../../common/messages';
 
 let mockContainerIds: Array<string> = [];
 
@@ -32,9 +33,9 @@ suite('Stop Non Related Command Tests', async () => {
 
     suite('With No Non Related Container', async () => {
 
-        test("Should show no non related container found message", async () => {
+        test(`Should show '${messages.NO_NON_RELATED_CONTAINER_FOUND}' message`, async () => {
             await commands.executeCommand('docker-run.stop:non-related');
-            const mockMessage = `No non related container found`;
+            const mockMessage = messages.NO_NON_RELATED_CONTAINER_FOUND;
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);

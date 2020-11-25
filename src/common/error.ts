@@ -1,4 +1,5 @@
 import { DEFAULT_FILE_NAME } from "./constants";
+import * as messages from './messages';
 
 export class NoFolderOrWorkspaceOpenedError extends Error {
     constructor(message: string = "No folder or workspace opened") {
@@ -63,7 +64,7 @@ export class EmptyConfigFileError extends EmptyConfigError {
 
 export class NoContainersFoundError extends Error {
 
-    constructor(message = 'No Containers Found') {
+    constructor(message = messages.NO_CONTAINERS_FOUND) {
         super(message);
     }
 }

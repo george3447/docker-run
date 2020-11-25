@@ -1,8 +1,9 @@
-import { ProgressLocation, window, commands } from "vscode";
+import { window, commands } from "vscode";
 
 import { getWorkspaceContainers, ContainerList, getGlobalContainers } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
+import * as messages from "../common/messages";
 
 export const disposableStopNonRelated = commands.registerCommand('docker-run.stop:non-related', async () => {
 
@@ -21,7 +22,7 @@ export const disposableStopNonRelated = commands.registerCommand('docker-run.sto
             .includes(runningContainer.containerId));
 
     if (!nonRelatedContainers.length) {
-        window.showWarningMessage('No non related container found');
+        window.showWarningMessage(messages.NO_NON_RELATED_CONTAINER_FOUND);
         return;
     }
 

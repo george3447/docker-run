@@ -1,8 +1,9 @@
-import { ProgressLocation, window, commands } from "vscode";
+import { window, commands } from "vscode";
 
 import { getWorkspaceContainers, ContainerList } from "../common/list";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
+import * as messages from "../common/messages";
 
 export const disposableStopAll = commands.registerCommand('docker-run.stop:all', async () => {
 
@@ -12,7 +13,7 @@ export const disposableStopAll = commands.registerCommand('docker-run.stop:all',
     });
 
     if (!containerList.length) {
-        window.showWarningMessage('No Containers Found For This Workspace');
+        window.showWarningMessage(messages.NO_CONTAINERS_FOUND_FOR_THIS_WORKSPACE);
         return;
     }
 
