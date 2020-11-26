@@ -1,4 +1,6 @@
 {
     "DockerRun.DisableAutoGenerateConfig": false,
-    "DockerRun.DisableAutoStopNonRelated": false
+    "DockerRun.DisableAutoStopNonRelated": false,
+    "DockerRun.DisableDockerrc": true,
+    "DockerRun.Containers": []
 }

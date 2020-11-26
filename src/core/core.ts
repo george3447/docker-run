@@ -3,10 +3,10 @@ import { DockerOptions } from "dockerode";
 
 import { ext } from "./ext-variables";
 import { window, commands, ConfigurationTarget } from 'vscode';
-import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, CONFIGURATION } from '../common/constants';
+import { AutoAdd, autoAddList, ConfigTarget, configTargetList, CONFIGURATION } from '../common/constants';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import { isSettingsDisabled, updateSettings } from '../common/settings';
-import { StartOperation, StopNonRelatedOperation, StopOperation} from './operations';
+import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
 
 export function initDockerode(options?: DockerOptions) {
     ext.dockerode = new Dockerode(options);
@@ -25,13 +25,13 @@ export async function initAutoAdd() {
     }
 
     const selection = await window.showQuickPick(autoAddList, {
-        placeHolder: `Do you want to automatically generate ${DEFAULT_FILE_NAME} by Docker Run?`
+        placeHolder: `Do you want to add containers for this workspace?`
     });
 
     if (selection && selection.id) {
         switch (selection.id) {
             case AutoAdd.YES:
-                await commands.executeCommand('docker-run.add', true);
+                await initConfigTarget();
                 break;
             case AutoAdd.SKIP_WORK_SPACE:
             case AutoAdd.SKIP_GLOBAL:
@@ -44,9 +44,22 @@ export async function initAutoAdd() {
     }
 }
 
+export async function initConfigTarget() {
+    const selection = await window.showQuickPick(configTargetList, {
+        placeHolder: `Where do you want to save the container ids`
+    });
+
+    if (selection) {
+        if (selection.id === ConfigTarget.Settings) {
+            await updateSettings(CONFIGURATION.DISABLE_DOCKERRC, true, ConfigurationTarget.Workspace);
+        }
+        await commands.executeCommand('docker-run.add', true);
+    }
+}
+
 export async function initAutoStart() {
     await commands.executeCommand('docker-run.start:all');
-    
+
     if (isSettingsDisabled(CONFIGURATION.DISABLE_AUTO_STOP_NON_RELATED)) {
         throw new AutoStopNonRelatedDisabledError('Disabled auto stopping of non related containers');
     }
