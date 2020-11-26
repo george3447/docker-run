@@ -4,6 +4,7 @@ import { getGlobalContainers, getWorkspaceContainers, ContainerList, extractCont
 import { writeConfig } from "../common/config";
 import { ext } from "../core/ext-variables";
 import { handleError } from "../common/error";
+import * as messages from '../common/messages';
 
 export const disposableAdd = commands.registerCommand('docker-run.add', async (createConfigFile?: boolean) => {
 
@@ -16,7 +17,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
     });
 
     if (!availableContainerList.length) {
-        window.showWarningMessage(`No Containers Found`);
+        window.showWarningMessage(messages.NO_CONTAINERS_FOUND);
         return;
     }
 
@@ -31,7 +32,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
                 .includes(availableContainer.containerId));
 
         if (!newContainers.length) {
-            window.showWarningMessage(`All Available Containers Are Already Added To Workspace`);
+            window.showWarningMessage(messages.ALREADY_ADDED_TO_WORKSPACE);
             return;
         }
 
@@ -43,7 +44,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
 
     const selection = await window.showQuickPick(quickPickList, {
         canPickMany: true,
-        placeHolder: 'Select Containers That You Need For This Workspace'
+        placeHolder: messages.SELECT_CONTAINERS
     });
 
     if (selection && selection.length > 0) {
@@ -51,7 +52,7 @@ export const disposableAdd = commands.registerCommand('docker-run.add', async (c
         await writeConfig(containerIds);
         await ext.startOperation.operateContainers(selection);
     } else {
-        window.showWarningMessage(`Please Select At least One Container To Add`);
+        window.showWarningMessage(messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_ADD);
         return;
     }
 });

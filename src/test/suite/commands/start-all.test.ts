@@ -8,6 +8,7 @@ import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StartOperation } from '../../../core/operations';
 import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
+import * as messages from '../../../common/messages';
 
 let mockContainerIds: Array<string> = [];
 
@@ -36,7 +37,7 @@ suite('Start All Command Tests', async () => {
 
         test("Should show no container found message", async () => {
             await commands.executeCommand('docker-run.start:all');
-            const mockMessage = `No Containers Found For This Workspace`;
+            const mockMessage = messages.NO_CONTAINERS_FOUND_FOR_THIS_WORKSPACE;
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
@@ -65,7 +66,7 @@ suite('Start All Command Tests', async () => {
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.start:all');
 
-            const mockMessage = `Successfully Started ${mockContainersList[0].label}`;
+            const mockMessage = messages.SUCCESSFULLY_STARTED_CONTAINER(mockContainersList[0].label);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
             const runningContainers = await getGlobalContainers(false, true);
 
@@ -77,12 +78,12 @@ suite('Start All Command Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).stop()));
         });
 
-        test("Should show container already running message", async () => {
+        test(`Should show 'Container already running' message`, async () => {
             await ext.dockerode.getContainer(mockContainerIds[0]).start();
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.start:all');
 
-            const mockMessage = `Container ${mockContainersList[0].label} Already Running`;
+            const mockMessage = messages.CONTAINER_ALREADY_RUNNING(mockContainersList[0].label);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
             const runningContainers = await getGlobalContainers(false, true);
 
@@ -116,7 +117,7 @@ suite('Start All Command Tests', async () => {
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.start:all');
 
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Started ${label}`);
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STARTED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const runningContainers = await getGlobalContainers(false, true);
 
@@ -128,13 +129,13 @@ suite('Start All Command Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).stop()));
         });
 
-        test("Should show progress message as 'Starting All Containers'", async () => {
+        test(`Should show progress message as '${messages.STARTING_ALL_CONTAINERS}'`, async () => {
 
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.start:all');
 
-            const mockProgressMessage = `Starting All Containers`;
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Started ${label}`);
+            const mockProgressMessage = messages.STARTING_ALL_CONTAINERS;
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STARTED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const runningContainers = await getGlobalContainers(false, true);
 
@@ -147,13 +148,13 @@ suite('Start All Command Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).stop()));
         });
 
-        test("Should show containers already running message", async () => {
+        test("Should show 'Container already running' message", async () => {
 
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.start:all');
 
-            const mockMessages = mockContainersList.map(({ label }) => `Container ${label} Already Running`);
+            const mockMessages = mockContainersList.map(({ label }) => messages.CONTAINER_ALREADY_RUNNING(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const runningContainers = await getGlobalContainers(false, true);
 

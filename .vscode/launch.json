@@ -15,7 +15,7 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Extension Tests V1",
+      "name": "Extension Tests Dockerrc(v1)",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",

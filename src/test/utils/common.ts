@@ -21,6 +21,7 @@ export const clearDockerrc = async () => {
 	}
 	const fileUri = getFileURI();
 	await workspace.fs.delete(fileUri);
+	await sleep();
 };
 
 export const setEmptyDockerrc = async () => {
@@ -30,4 +31,11 @@ export const setEmptyDockerrc = async () => {
 	}
 	const writeData = Buffer.from('', 'utf8');
 	await workspace.fs.writeFile(getFileURI(), writeData);
+	await sleep();
 };
+
+function sleep(timeOut: number = 100) {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => { resolve(); }, timeOut);
+	});
+}

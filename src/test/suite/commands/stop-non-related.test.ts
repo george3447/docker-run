@@ -6,6 +6,7 @@ import { getMockContainerIds, removeMockContainers } from '../../utils/container
 import { ext } from '../../../core/ext-variables';
 import { StopNonRelatedOperation } from '../../../core/operations';
 import { getGlobalContainers } from '../../../common/list';
+import * as messages from '../../../common/messages';
 
 let mockContainerIds: Array<string> = [];
 
@@ -32,9 +33,9 @@ suite('Stop Non Related Command Tests', async () => {
 
     suite('With No Non Related Container', async () => {
 
-        test("Should show no non related container found message", async () => {
+        test(`Should show '${messages.NO_NON_RELATED_CONTAINER_FOUND}' message`, async () => {
             await commands.executeCommand('docker-run.stop:non-related');
-            const mockMessage = `No non related container found`;
+            const mockMessage = messages.NO_NON_RELATED_CONTAINER_FOUND;
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
@@ -59,7 +60,7 @@ suite('Stop Non Related Command Tests', async () => {
             const mockContainersList = await getGlobalContainers(false, true);
             await commands.executeCommand('docker-run.stop:non-related');
 
-            const mockMessage = `Successfully Stopped Non Related Container ${mockContainersList[0].label}`;
+            const mockMessage = messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(mockContainersList[0].label);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -92,7 +93,7 @@ suite('Stop Non Related Command Tests', async () => {
             const mockContainersList = await getGlobalContainers(false, true);
             await commands.executeCommand('docker-run.stop:non-related');
 
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped Non Related Container ${label}`);
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -104,13 +105,13 @@ suite('Stop Non Related Command Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
         });
 
-        test("Should show progress message as 'Stopping Non Related Containers'", async () => {
+        test(`Should show progress message as '${messages.STOPPING_NON_RELATED_CONTAINERS}'`, async () => {
 
             const mockContainersList = await getGlobalContainers(false, true);
             await commands.executeCommand('docker-run.stop:non-related');
 
-            const mockProgressMessage = `Stopping Non Related Containers`;
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped Non Related Container ${label}`);
+            const mockProgressMessage = messages.STOPPING_NON_RELATED_CONTAINERS;
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 

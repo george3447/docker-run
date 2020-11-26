@@ -3,6 +3,7 @@ import { Container } from "dockerode";
 
 import { ContainerList, ContainerListItem, isContainerExists } from "../../common/list";
 import { ext } from "../ext-variables";
+import * as messages from "../../common/messages";
 
 export abstract class Operation {
 
@@ -50,7 +51,7 @@ export abstract class Operation {
         const isContainerExist = await isContainerExists(containerId);
 
         if (!isContainerExist) {
-            window.showWarningMessage(`No Container With Given Container Id ${containerId} Found`);
+            window.showWarningMessage(messages.NO_CONTAINER_WITH_CONTAINER_ID_FOUND(containerId));
             return;
         }
 

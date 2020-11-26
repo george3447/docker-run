@@ -7,6 +7,7 @@ import { AutoAdd, autoAddList, ConfigTarget, configTargetList, CONFIGURATION } f
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import { isSettingsDisabled, updateSettings } from '../common/settings';
 import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
+import * as messages from '../common/messages';
 
 export function initDockerode(options?: DockerOptions) {
     ext.dockerode = new Dockerode(options);
@@ -25,7 +26,7 @@ export async function initAutoAdd() {
     }
 
     const selection = await window.showQuickPick(autoAddList, {
-        placeHolder: `Do you want to add containers for this workspace?`
+        placeHolder: messages.ADD_CONTAINERS_FOR_WORKSPACE
     });
 
     if (selection && selection.id) {

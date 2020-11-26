@@ -22,7 +22,7 @@ jobs:
     
     - run: npm install
 
-    - name: Run tests for v1
+    - name: Run tests for .dockerrc(v1)
       run: xvfb-run -a npm run test:v1
     
     - name: Run tests

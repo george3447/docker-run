@@ -26,11 +26,11 @@ export enum ConfigTarget {
 export const autoAddList: AutoAddList = [
     { label: 'Yes', id: AutoAdd.YES },
     { label: 'No', id: AutoAdd.No },
-    { label: 'Never Add For This Workspace', id: AutoAdd.SKIP_WORK_SPACE },
-    { label: 'Never, I Will Add It Myself For Each Workspaces', id: AutoAdd.SKIP_GLOBAL }
+    { label: 'Never add for this workspace', id: AutoAdd.SKIP_WORK_SPACE },
+    { label: 'Never, I will add it myself for each workspaces', id: AutoAdd.SKIP_GLOBAL }
 ];
 
 export const configTargetList: ConfigTargetList = [
-    { label: 'VS Code Settings', id: ConfigTarget.Settings, picked: true },
-    { label: 'Separate Dockerrc File', id: ConfigTarget.DockerrcFile },
+    { label: 'VS Code settings', id: ConfigTarget.Settings, picked: true },
+    { label: 'Separate .dockerrc file', id: ConfigTarget.DockerrcFile },
 ];

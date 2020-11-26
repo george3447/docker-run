@@ -2,6 +2,7 @@ import { Container } from "dockerode";
 import { window } from "vscode";
 
 import { Operation } from "./operation";
+import * as messages from "../../common/messages";
 
 export class StartOperation extends Operation {
     constructor() {
@@ -9,11 +10,11 @@ export class StartOperation extends Operation {
     }
 
     getProgressTitleForSingleContainer(label: string) {
-        return `Starting Container ${label}`;
+        return messages.STARTING_CONTAINER(label);
     }
 
     getProgressTitleForMultipleContainers(isAll: boolean) {
-        return `Starting ${isAll ? 'All' : 'Selected'} Containers`;
+        return isAll ? messages.STARTING_ALL_CONTAINERS : messages.STARTING_SELECTED_CONTAINERS;
     }
 
     async operate(container: Container, label: string) {
@@ -21,11 +22,11 @@ export class StartOperation extends Operation {
         const { State: { Running } } = containerInfo;
 
         if (Running === true) {
-            window.showInformationMessage(`Container ${label} Already Running`);
+            window.showInformationMessage(messages.CONTAINER_ALREADY_RUNNING(label));
             return;
         }
 
         await container.start();
-        window.showInformationMessage(`Successfully Started ${label}`);
+        window.showInformationMessage(messages.SUCCESSFULLY_STARTED_CONTAINER(label));
     }
 }

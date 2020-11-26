@@ -8,6 +8,7 @@ import { ext } from '../../../core/ext-variables';
 import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
 import { StopOperation } from '../../../core/operations';
 import { ContainerList } from '../../../common/list';
+import * as messages from "../../../common/messages";
 
 let mockContainerIds: Array<string> = [];
 
@@ -36,9 +37,9 @@ suite('Remove Command Tests', async () => {
 
     suite('With No Container In Config', async () => {
 
-        test("Should show 'add at least one container' message", async () => {
+        test(`Should show '${messages.ADD_AT_LEAST_ONE_CONTAINER_TO_WORKSPACE}' message`, async () => {
             await commands.executeCommand('docker-run.remove');
-            const mockMessage = `Please Add At least One Container To Workspace`;
+            const mockMessage = messages.ADD_AT_LEAST_ONE_CONTAINER_TO_WORKSPACE;
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
             assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
@@ -67,9 +68,9 @@ suite('Remove Command Tests', async () => {
 
         });
 
-        test("Should show 'select at least one container' warning message, if no container selected from quick pick", async () => {
+        test(`Should show '${messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_REMOVE}' warning message, if no container selected from quick pick`, async () => {
             stubQuickPick.resolves([] as any);
-            const mockMessage = `Please Select At least One Container To Remove`;
+            const mockMessage = messages.SELECT_AT_LEAST_ONE_CONTAINER_TO_REMOVE;
 
             await commands.executeCommand('docker-run.remove');
             const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
