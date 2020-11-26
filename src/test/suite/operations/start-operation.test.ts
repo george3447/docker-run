@@ -136,7 +136,7 @@ suite('Start Operation Tests', async () => {
             const mockContainersList = await getWorkspaceContainers(true);
             await ext.startOperation.operateContainers(mockContainersList, true);
 
-            const mockProgressMessage = messages.STARTING_ALL_CONTAINERS
+            const mockProgressMessage = messages.STARTING_ALL_CONTAINERS;
             const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STARTED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const runningContainers = await getGlobalContainers(false, true);

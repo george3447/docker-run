@@ -14,7 +14,7 @@ export class StartOperation extends Operation {
     }
 
     getProgressTitleForMultipleContainers(isAll: boolean) {
-        return isAll ? messages.STARTING_ALL_CONTAINERS : messages.STARTING_SELECTED_CONTAINERS
+        return isAll ? messages.STARTING_ALL_CONTAINERS : messages.STARTING_SELECTED_CONTAINERS;
     }
 
     async operate(container: Container, label: string) {
