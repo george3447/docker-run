@@ -67,7 +67,7 @@ suite('Stop All Command Tests', async () => {
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.stop:all');
 
-            const mockMessage = `Successfully Stopped ${mockContainersList[0].label}`;
+            const mockMessage = messages.SUCCESSFULLY_STOPPED_CONTAINER(mockContainersList[0].label);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -105,7 +105,7 @@ suite('Stop All Command Tests', async () => {
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.stop:all');
 
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped ${label}`);
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -117,13 +117,13 @@ suite('Stop All Command Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
         });
 
-        test("Should show progress message as 'Stopping All Containers'", async () => {
+        test(`Should show progress message as '${messages.STOPPING_ALL_CONTAINERS}'`, async () => {
 
             const mockContainersList = await getWorkspaceContainers(true);
             await commands.executeCommand('docker-run.stop:all');
 
-            const mockProgressMessage = `Stopping All Containers`;
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped ${label}`);
+            const mockProgressMessage = messages.STOPPING_ALL_CONTAINERS;
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 

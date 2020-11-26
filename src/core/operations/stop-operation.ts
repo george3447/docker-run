@@ -2,6 +2,7 @@ import { Container } from "dockerode";
 import { window } from "vscode";
 
 import { Operation } from "./operation";
+import * as messages from '../../common/messages';
 
 export class StopOperation extends Operation {
     constructor() {
@@ -9,11 +10,11 @@ export class StopOperation extends Operation {
     }
 
     getProgressTitleForSingleContainer(label: string) {
-        return `Stopping Container ${label}`;
+        return messages.STOPPING_CONTAINER(label);
     }
 
     getProgressTitleForMultipleContainers(isAll: boolean) {
-        return `Stopping ${isAll ? 'All' : 'Selected'} Containers`;
+        return isAll ? messages.STOPPING_ALL_CONTAINERS : messages.STOPPING_SELECTED_CONTAINERS;
     }
 
     async operate(container: Container, label: string) {
@@ -26,6 +27,6 @@ export class StopOperation extends Operation {
         }
 
         await container.stop();
-        window.showInformationMessage(`Successfully Stopped ${label}`);
+        window.showInformationMessage(messages.SUCCESSFULLY_STOPPED_CONTAINER(label));
     }
 }

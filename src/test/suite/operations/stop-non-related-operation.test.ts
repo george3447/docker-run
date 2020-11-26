@@ -52,7 +52,7 @@ suite('Stop Non Related Operation Tests', async () => {
             await ext.dockerode.getContainer(mockContainersList[0].containerId).start();
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
-            const mockMessage = `Successfully Stopped Non Related Container ${mockContainersList[0].label}`;
+            const mockMessage = messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(mockContainersList[0].label);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -109,7 +109,7 @@ suite('Stop Non Related Operation Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
             await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
 
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped Non Related Container ${label}`);
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 

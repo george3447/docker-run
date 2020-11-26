@@ -6,7 +6,8 @@ import { window, commands, ConfigurationTarget } from 'vscode';
 import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, CONFIGURATION } from '../common/constants';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import { isSettingsDisabled, updateSettings } from '../common/settings';
-import { StartOperation, StopNonRelatedOperation, StopOperation} from './operations';
+import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
+import * as messages from '../common/messages';
 
 export function initDockerode(options?: DockerOptions) {
     ext.dockerode = new Dockerode(options);
@@ -25,7 +26,7 @@ export async function initAutoAdd() {
     }
 
     const selection = await window.showQuickPick(autoAddList, {
-        placeHolder: `Do you want to automatically generate ${DEFAULT_FILE_NAME} by Docker Run?`
+        placeHolder: messages.AUTOMATICALLY_GENERATE(DEFAULT_FILE_NAME)
     });
 
     if (selection && selection.id) {
@@ -46,7 +47,7 @@ export async function initAutoAdd() {
 
 export async function initAutoStart() {
     await commands.executeCommand('docker-run.start:all');
-    
+
     if (isSettingsDisabled(CONFIGURATION.DISABLE_AUTO_STOP_NON_RELATED)) {
         throw new AutoStopNonRelatedDisabledError('Disabled auto stopping of non related containers');
     }

@@ -104,7 +104,7 @@ suite('Stop Command Tests', () => {
             const mockContainersList = await getWorkspaceContainers(true);
             await ext.dockerode.getContainer(mockContainerIds[0]).start();
             stubQuickPick.resolves([{ label: 'Test', containerId: mockContainerIds[0] }] as any);
-            const mockMessage = `Successfully Stopped Test`;
+            const mockMessage = messages.SUCCESSFULLY_STOPPED_CONTAINER('Test');
 
             await commands.executeCommand('docker-run.stop');
 
@@ -127,7 +127,7 @@ suite('Stop Command Tests', () => {
                 label: `Test_${index + 1}`, containerId
             }));
             stubQuickPick.resolves(mockListItems as any);
-            const mockMessages = mockListItems.map(({ label }) => `Successfully Stopped ${label}`);
+            const mockMessages = mockListItems.map(({ label }) => messages.SUCCESSFULLY_STOPPED_CONTAINER(label));
 
             await commands.executeCommand('docker-run.stop');
 

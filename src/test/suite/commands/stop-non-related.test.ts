@@ -60,7 +60,7 @@ suite('Stop Non Related Command Tests', async () => {
             const mockContainersList = await getGlobalContainers(false, true);
             await commands.executeCommand('docker-run.stop:non-related');
 
-            const mockMessage = `Successfully Stopped Non Related Container ${mockContainersList[0].label}`;
+            const mockMessage = messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(mockContainersList[0].label);
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -93,7 +93,7 @@ suite('Stop Non Related Command Tests', async () => {
             const mockContainersList = await getGlobalContainers(false, true);
             await commands.executeCommand('docker-run.stop:non-related');
 
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped Non Related Container ${label}`);
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -105,13 +105,13 @@ suite('Stop Non Related Command Tests', async () => {
             await Promise.all(mockContainerIds.map(mockContainerId => ext.dockerode.getContainer(mockContainerId).start()));
         });
 
-        test("Should show progress message as 'Stopping Non Related Containers'", async () => {
+        test(`Should show progress message as '${messages.STOPPING_NON_RELATED_CONTAINERS}'`, async () => {
 
             const mockContainersList = await getGlobalContainers(false, true);
             await commands.executeCommand('docker-run.stop:non-related');
 
-            const mockProgressMessage = `Stopping Non Related Containers`;
-            const mockMessages = mockContainersList.map(({ label }) => `Successfully Stopped Non Related Container ${label}`);
+            const mockProgressMessage = messages.STOPPING_NON_RELATED_CONTAINERS;
+            const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(label));
             const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
             const stoppedContainers = await getGlobalContainers(false, false);
 

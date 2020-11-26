@@ -4,6 +4,7 @@ import { existsSync } from "fs";
 
 import { DEFAULT_FILE_NAME, } from "./constants";
 import { DockerrcNotFoundError, EmptyConfigFileError, EmptyConfigArrayError, NoFolderOrWorkspaceOpenedError } from "./error";
+import * as messages from '../common/messages';
 
 function getFileUri() {
     if (!workspace.workspaceFolders) {
@@ -42,7 +43,7 @@ export async function getConfig() {
 
 export async function writeConfig(containerIds: Array<string>) {
     if (!workspace.workspaceFolders) {
-        return window.showInformationMessage('No folder or workspace opened');
+        return window.showInformationMessage(messages.NO_FOLDER_OR_WORKSPACE_OPENED);
     }
 
     const writeStr = JSON.stringify({ containers: containerIds });
