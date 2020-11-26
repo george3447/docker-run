@@ -11,6 +11,16 @@ export function isSettingsDisabled(configurationKey: string): boolean {
     return false;
 }
 
+export function getConfiguration(configurationKey: string): any | null {
+    const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
+    const configInfo = workspaceConfiguration.inspect(configurationKey);
+    if (configInfo && (configInfo.globalValue || configInfo.workspaceValue)) {
+        return configInfo.globalValue || configInfo.workspaceValue;
+    }
+    return null;
+}
+
+
 export async function updateSettings(section: string, value: any, configurationTarget: ConfigurationTarget) {
     const workspaceConfiguration = workspace.getConfiguration(CONFIGURATION.SECTION);
     await workspaceConfiguration.update(section, value, configurationTarget);

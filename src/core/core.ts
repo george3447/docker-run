@@ -3,7 +3,7 @@ import { DockerOptions } from "dockerode";
 
 import { ext } from "./ext-variables";
 import { window, commands, ConfigurationTarget } from 'vscode';
-import { DEFAULT_FILE_NAME, AutoAdd, autoAddList, CONFIGURATION } from '../common/constants';
+import { AutoAdd, autoAddList, ConfigTarget, configTargetList, CONFIGURATION } from '../common/constants';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import { isSettingsDisabled, updateSettings } from '../common/settings';
 import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
@@ -26,13 +26,13 @@ export async function initAutoAdd() {
     }
 
     const selection = await window.showQuickPick(autoAddList, {
-        placeHolder: messages.AUTOMATICALLY_GENERATE(DEFAULT_FILE_NAME)
+        placeHolder: messages.ADD_CONTAINERS_FOR_WORKSPACE
     });
 
     if (selection && selection.id) {
         switch (selection.id) {
             case AutoAdd.YES:
-                await commands.executeCommand('docker-run.add', true);
+                await initConfigTarget();
                 break;
             case AutoAdd.SKIP_WORK_SPACE:
             case AutoAdd.SKIP_GLOBAL:
@@ -42,6 +42,19 @@ export async function initAutoAdd() {
             case AutoAdd.No:
                 break;
         }
+    }
+}
+
+export async function initConfigTarget() {
+    const selection = await window.showQuickPick(configTargetList, {
+        placeHolder: `Where do you want to save the container ids`
+    });
+
+    if (selection) {
+        if (selection.id === ConfigTarget.Settings) {
+            await updateSettings(CONFIGURATION.DISABLE_DOCKERRC, true, ConfigurationTarget.Workspace);
+        }
+        await commands.executeCommand('docker-run.add', true);
     }
 }
 

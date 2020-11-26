@@ -1,4 +1,4 @@
-import { AutoAdd } from "./constants";
+import { AutoAdd, ConfigTarget } from "./constants";
 import { QuickPickItem } from "vscode";
 
 export interface AutoAddListItem extends QuickPickItem {
@@ -6,3 +6,9 @@ export interface AutoAddListItem extends QuickPickItem {
 }
 
 export type AutoAddList = Array<AutoAddListItem>;
+
+export interface ConfigTargetItem extends QuickPickItem {
+    id: ConfigTarget;
+}
+
+export type ConfigTargetList = Array<ConfigTargetItem>;

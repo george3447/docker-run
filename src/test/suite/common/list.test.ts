@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 
-import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
+import { clearDockerrc, isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
 import { getMockContainer, getMockContainerIds, removeMockContainer, removeMockContainers } from '../../utils/container';
 import { writeConfig } from '../../../common/config';
 import { getWorkspaceContainers, extractContainerIds, getGlobalContainers } from '../../../common/list';
@@ -11,10 +11,11 @@ let mockContainerIds: Array<string> = [];
 
 suite('List Tests', async () => {
 
-    test("Should throw empty config file error ", async () => {
-        await assert.rejects(async () => getWorkspaceContainers(true), new EmptyConfigFileError(undefined, 'Docker Utils'));
-    });
-
+    if (!isDockerrcDisabled()) {
+        test("Should throw empty config file error ", async () => {
+            await assert.rejects(async () => getWorkspaceContainers(true), new EmptyConfigFileError(undefined, 'Docker Utils'));
+        });
+    }
     test("Should throw no containers found error ", async () => {
         await assert.rejects(async () => getGlobalContainers(true), new NoContainersFoundError(undefined));
     });
