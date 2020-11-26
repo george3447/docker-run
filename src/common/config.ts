@@ -31,60 +31,68 @@ export function isConfigAvailable() {
 
 export async function getConfig() {
 
+    let containers;
     if (isDockerrcDisabled()) {
-        const containers = getConfiguration(CONFIGURATION.CONTAINERS);
-        if (!containers.length) {
-            throw new EmptyConfigArrayError();
-        }
-        return containers;
+        containers = getConfiguration(CONFIGURATION.CONTAINERS);
     } else {
-
-        const fileUri = getFileUri();
-
-        if (!fileUri) {
-            throw new DockerrcNotFoundError();
-        }
-
-        const readData = await workspace.fs.readFile(fileUri);
-        const stringData = Buffer.from(readData).toString('utf8');
-        if (!stringData) {
-            throw new EmptyConfigFileError();
-        }
-        const config = JSON.parse(stringData);
-
-        if (!config || !config.containers || !config.containers.length) {
-            throw new EmptyConfigArrayError();
-        }
-        return config.containers;
+        containers = await getConfigFromDockerrc();
     }
+
+    if (!containers.length) {
+        throw new EmptyConfigArrayError();
+    }
+
+    return containers;
 }
 
 export async function writeConfig(containerIds: Array<string>) {
+    if (isDockerrcDisabled()) {
+        await updateSettings(CONFIGURATION.CONTAINERS, containerIds, ConfigurationTarget.Workspace);
+    } else {
+        await writeConfigToDockerrc(containerIds);
+    }
+}
+
+async function getConfigFromDockerrc() {
+    const fileUri = getFileUri();
+
+    if (!fileUri) {
+        throw new DockerrcNotFoundError();
+    }
+
+    const readData = await workspace.fs.readFile(fileUri);
+    const stringData = Buffer.from(readData).toString('utf8');
+    if (!stringData) {
+        throw new EmptyConfigFileError();
+    }
+    const config = JSON.parse(stringData);
+
+    if (!config || !config.containers) {
+        return [];
+    }
+    return config.containers;
+}
+
+async function writeConfigToDockerrc(containerIds: Array<string>) {
+
     if (!workspace.workspaceFolders) {
         return window.showInformationMessage(messages.NO_FOLDER_OR_WORKSPACE_OPENED);
     }
 
-    if (isDockerrcDisabled()) {
-        await updateSettings(CONFIGURATION.CONTAINERS, containerIds, ConfigurationTarget.Workspace);
-    } else {
+    const writeStr = JSON.stringify({ containers: containerIds });
+    const writeData = Buffer.from(writeStr, 'utf8');
+    const folderUri = workspace.workspaceFolders[0].uri;
+    const fileUri = folderUri.with({ path: posix.join(folderUri.path, DEFAULT_FILE_NAME) });
+    await workspace.fs.writeFile(fileUri, writeData);
 
-        const writeStr = JSON.stringify({ containers: containerIds });
-        const writeData = Buffer.from(writeStr, 'utf8');
+    const textEditor = await window.showTextDocument(fileUri);
+    const { document, options } = textEditor;
+    await languages.setTextDocumentLanguage(document, 'json');
 
-        const folderUri = workspace.workspaceFolders[0].uri;
-        const fileUri = folderUri.with({ path: posix.join(folderUri.path, DEFAULT_FILE_NAME) });
-
-        await workspace.fs.writeFile(fileUri, writeData);
-
-        const textEditor = await window.showTextDocument(fileUri);
-        const { document, options } = textEditor;
-        await languages.setTextDocumentLanguage(document, 'json');
-
-        const { uri } = document;
-        const formatted = await commands.executeCommand('vscode.executeFormatDocumentProvider', uri, options);
-        const workEdits = new WorkspaceEdit();
-        workEdits.set(uri, formatted as Array<TextEdit>);
-        await workspace.applyEdit(workEdits);
-        await document.save();
-    }
+    const { uri } = document;
+    const formatted = await commands.executeCommand('vscode.executeFormatDocumentProvider', uri, options);
+    const workEdits = new WorkspaceEdit();
+    workEdits.set(uri, formatted as Array<TextEdit>);
+    await workspace.applyEdit(workEdits);
+    await document.save();
 }
