@@ -1,40 +1,38 @@
-import { ExtensionContext, commands } from 'vscode';
+import { commands, ExtensionContext } from 'vscode';
 
-import { initDockerode, initContainerOperations, initAutoAdd, initAutoStart } from './core/core';
-import { isConfigAvailable, isDockerrcDisabled } from './common/config';
 import { disposableAdd } from './commands/add';
 import { disposableRemove } from './commands/remove';
-import { disposableStartAll } from './commands/start-all';
-import { disposableStopAll } from './commands/stop-all';
 import { disposableStart } from './commands/start';
+import { disposableStartAll } from './commands/start-all';
 import { disposableStop } from './commands/stop';
-import { handleError } from './common/error';
+import { disposableStopAll } from './commands/stop-all';
 import { disposableStopNonRelated } from './commands/stop-non-related';
+import { isConfigAvailable } from './common/config';
+import { handleError } from './common/error';
+import { initAutoAdd, initAutoStart, initContainerOperations, initDockerode } from './core/core';
 
 export async function activate(context: ExtensionContext) {
+  initDockerode();
 
-	initDockerode();
+  initContainerOperations();
 
-	initContainerOperations();
+  context.subscriptions.push(
+    disposableAdd,
+    disposableRemove,
+    disposableStartAll,
+    disposableStopAll,
+    disposableStopNonRelated,
+    disposableStart,
+    disposableStop
+  );
 
-	context.subscriptions.push
-		(
-			disposableAdd,
-			disposableRemove,
-			disposableStartAll,
-			disposableStopAll,
-			disposableStopNonRelated,
-			disposableStart,
-			disposableStop
-		);
-
-	if (!isConfigAvailable()) {
-		await initAutoAdd().catch(handleError);
-	} else {
-		await initAutoStart().catch(handleError);
-	}
+  if (!isConfigAvailable()) {
+    await initAutoAdd().catch(handleError);
+  } else {
+    await initAutoStart().catch(handleError);
+  }
 }
 
 export async function deactivate() {
-	await commands.executeCommand('docker-run.stop:all');
+  await commands.executeCommand('docker-run.stop:all');
 }
