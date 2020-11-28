@@ -7,7 +7,7 @@ import { ContainerList } from '../../../common/list';
 import * as messages from '../../../common/messages';
 import { ext } from '../../../core/ext-variables';
 import { StartOperation } from '../../../core/operations';
-import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
+import { setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 
 let mockContainerIds: Array<string> = [];
@@ -44,8 +44,7 @@ suite('Add Command Tests', async () => {
 
   suite('With Available Containers', async () => {
     teardown(async () => {
-      await Promise.all([removeMockContainers(mockContainerIds), clearDockerrc()]);
-      await setEmptyDockerrc();
+      await Promise.all([removeMockContainers(mockContainerIds), setEmptyDockerrc()]);
     });
 
     test(`Should show message '${messages.ALREADY_ADDED_TO_WORKSPACE}', if no container left to add`, async () => {

@@ -1,10 +1,12 @@
 import * as assert from 'assert';
+import { restore, SinonStub, stub } from 'sinon';
+import { workspace } from 'vscode';
 
 import { writeConfig } from '../../../common/config';
 import { EmptyConfigFileError, NoContainersFoundError } from '../../../common/error';
 import { extractContainerIds, getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
 import { ext } from '../../../core/ext-variables';
-import { clearDockerrc, isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
+import { isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
 import {
   getMockContainer,
   getMockContainerIds,
@@ -16,11 +18,24 @@ let mockContainerIds: Array<string> = [];
 
 suite('List Tests', async () => {
   if (!isDockerrcDisabled()) {
-    test('Should throw empty config file error ', async () => {
-      await assert.rejects(
-        async () => getWorkspaceContainers(true),
-        new EmptyConfigFileError(undefined, 'Docker Utils')
-      );
+    suite('With dockerrc file', async () => {
+      let fsReadFileStub: SinonStub;
+
+      setup(async () => {
+        fsReadFileStub = stub(workspace.fs, 'readFile');
+      });
+
+      teardown(async () => {
+        restore();
+      });
+
+      test('Should throw empty config file error ', async () => {
+        fsReadFileStub.resolves('');
+        await assert.rejects(
+          async () => getWorkspaceContainers(true),
+          new EmptyConfigFileError(undefined, 'Docker Utils')
+        );
+      });
     });
   }
   test('Should throw no containers found error ', async () => {
@@ -35,7 +50,6 @@ suite('List Tests', async () => {
 
     suiteTeardown(async () => {
       await removeMockContainers(mockContainerIds);
-      await clearDockerrc();
       await setEmptyDockerrc();
     });
 
