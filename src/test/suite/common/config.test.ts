@@ -1,9 +1,11 @@
 import * as assert from 'assert';
-import { extensions } from 'vscode';
+import * as fs from 'fs';
+import { restore, SinonStub, stub } from 'sinon';
+import { extensions, workspace } from 'vscode';
 
 import { getConfig, writeConfig } from '../../../common/config';
 import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../../common/error';
-import { clearDockerrc, isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
+import { isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
 
 const mockContainerIds = ['asd123asd123', '123asd123asd123asd'];
 
@@ -14,14 +16,38 @@ suite('Config Tests', async () => {
   });
 
   if (!isDockerrcDisabled()) {
-    test('Should get no dockerrc found error', async () => {
-      await clearDockerrc();
-      await assert.rejects(async () => await getConfig(), new DockerrcNotFoundError());
+    suite('With no dockerrc file', async () => {
+      let fsExistsSyncStub: SinonStub;
+
+      setup(async () => {
+        fsExistsSyncStub = stub(fs, 'existsSync');
+      });
+
+      teardown(async () => {
+        restore();
+      });
+
+      test('Should get no dockerrc found error', async () => {
+        fsExistsSyncStub.returns(false);
+        await assert.rejects(async () => await getConfig(), new DockerrcNotFoundError());
+      });
     });
 
-    test('Should get empty config file error', async () => {
-      await setEmptyDockerrc();
-      await assert.rejects(async () => await getConfig(), new EmptyConfigFileError());
+    suite('With dockerrc file', async () => {
+      let fsReadFileStub: SinonStub;
+
+      setup(async () => {
+        fsReadFileStub = stub(workspace.fs, 'readFile');
+      });
+
+      teardown(async () => {
+        restore();
+      });
+
+      test('Should get empty config file error', async () => {
+        fsReadFileStub.resolves('');
+        await assert.rejects(async () => await getConfig(), new EmptyConfigFileError());
+      });
     });
   }
 
@@ -36,21 +62,18 @@ suite('Config Tests', async () => {
     });
 
     suiteTeardown(async () => {
-      await clearDockerrc();
       await setEmptyDockerrc();
     });
 
     test('Should write configuration', async () => {
       await writeConfig(mockContainerIds);
       const currentConfig = await getConfig();
-      await clearDockerrc();
       assert.deepStrictEqual(mockContainerIds, currentConfig);
     });
 
     test('Should get config', async () => {
       await writeConfig(mockContainerIds);
       const currentConfig = await getConfig();
-      await clearDockerrc();
       assert.deepStrictEqual(mockContainerIds, currentConfig);
     });
   });

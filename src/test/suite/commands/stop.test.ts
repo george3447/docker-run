@@ -7,7 +7,7 @@ import { ContainerList, getWorkspaceContainers } from '../../../common/list';
 import * as messages from '../../../common/messages';
 import { ext } from '../../../core/ext-variables';
 import { StopOperation } from '../../../core/operations';
-import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
+import { setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 
 let mockContainerIds: Array<string> = [];
@@ -51,15 +51,13 @@ suite('Stop Command Tests', () => {
       const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
 
       assert.strictEqual(mockMessage, spyShowWarningMessageArgs);
-      await Promise.all([removeMockContainers(mockContainerIds), clearDockerrc()]);
-      await setEmptyDockerrc();
+      await Promise.all([removeMockContainers(mockContainerIds), setEmptyDockerrc()]);
     });
   });
 
   suite('With Available Containers', async () => {
     teardown(async () => {
-      await Promise.all([removeMockContainers(mockContainerIds), clearDockerrc()]);
-      await setEmptyDockerrc();
+      await Promise.all([removeMockContainers(mockContainerIds), setEmptyDockerrc()]);
     });
 
     test('Should show quick pick with container list', async () => {

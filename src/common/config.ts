@@ -89,19 +89,24 @@ async function getConfigFromDockerrc() {
   return config.containers;
 }
 
-async function writeConfigToDockerrc(containerIds: Array<string>) {
+export async function writeConfigToDockerrc(containerIds: Array<string>) {
   if (!workspace.workspaceFolders) {
     return window.showInformationMessage(messages.NO_FOLDER_OR_WORKSPACE_OPENED);
   }
 
-  const writeStr = JSON.stringify({ containers: containerIds });
   const folderUri = workspace.workspaceFolders[0].uri;
   const fileUri = folderUri.with({ path: posix.join(folderUri.path, DEFAULT_FILE_NAME) });
+
+  if (!getFileUri()) {
+    const writeData = Buffer.from('', 'utf8');
+    await workspace.fs.writeFile(fileUri, writeData);
+  }
+
+  //const fileUri = folderUri.with({ path: posix.join(folderUri.path, DEFAULT_FILE_NAME) });
   const document = await workspace.openTextDocument(fileUri);
   const textEditor = await window.showTextDocument(fileUri);
-  const { options } = textEditor;
-  const { uri } = document;
 
+  const writeStr = JSON.stringify({ containers: containerIds });
   let textEdit;
 
   if (document.lineCount > 0) {
@@ -115,9 +120,16 @@ async function writeConfigToDockerrc(containerIds: Array<string>) {
   }
 
   const workEdits = new WorkspaceEdit();
-  workEdits.set(uri, [textEdit] as Array<TextEdit>);
+  workEdits.set(document.uri, [textEdit] as Array<TextEdit>);
   await workspace.applyEdit(workEdits);
-  await formatAndSaveDockerrc(document, options);
+  await formatAndSaveDockerrc(document, textEditor.options);
+}
+
+export async function removeDockerrc() {
+  const fileUri = getFileUri();
+  if (fileUri) {
+    await workspace.fs.delete(fileUri);
+  }
 }
 
 async function formatAndSaveDockerrc(document: TextDocument, options: TextEditorOptions) {

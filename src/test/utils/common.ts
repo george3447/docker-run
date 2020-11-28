@@ -1,27 +1,11 @@
-import { ConfigurationTarget, Uri, workspace } from 'vscode';
-import path = require('path');
+import { ConfigurationTarget } from 'vscode';
 
-import { isDockerrcDisabled as isDockerrcConfigDisabled } from '../../common/config';
-import { CONFIGURATION, DEFAULT_FILE_NAME } from '../../common/constants';
+import { isDockerrcDisabled as isDockerrcConfigDisabled, writeConfigToDockerrc } from '../../common/config';
+import { CONFIGURATION } from '../../common/constants';
 import { updateSettings } from '../../common/settings';
-
-const testConfigFilePath = path.resolve(__dirname, `../../../src/test/workspace-v1/${DEFAULT_FILE_NAME}`);
-
-const getFileURI = () => {
-  return Uri.file(testConfigFilePath);
-};
 
 export const isDockerrcDisabled = () => {
   return isDockerrcConfigDisabled();
-};
-
-export const clearDockerrc = async () => {
-  if (isDockerrcDisabled()) {
-    return;
-  }
-  const fileUri = getFileURI();
-  await workspace.fs.delete(fileUri);
-  await sleep();
 };
 
 export const setEmptyDockerrc = async () => {
@@ -29,15 +13,5 @@ export const setEmptyDockerrc = async () => {
     await updateSettings(CONFIGURATION.CONTAINERS, [], ConfigurationTarget.Workspace);
     return;
   }
-  const writeData = Buffer.from('', 'utf8');
-  await workspace.fs.writeFile(getFileURI(), writeData);
-  await sleep();
+  await writeConfigToDockerrc([]);
 };
-
-function sleep(timeOut = 100) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, timeOut);
-  });
-}

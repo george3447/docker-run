@@ -7,7 +7,7 @@ import { ContainerList } from '../../../common/list';
 import * as messages from '../../../common/messages';
 import { ext } from '../../../core/ext-variables';
 import { StopOperation } from '../../../core/operations';
-import { clearDockerrc, setEmptyDockerrc } from '../../utils/common';
+import { setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 
 let mockContainerIds: Array<string> = [];
@@ -51,7 +51,6 @@ suite('Remove Command Tests', async () => {
 
     suiteTeardown(async () => {
       await removeMockContainers(mockContainerIds);
-      await clearDockerrc();
       await setEmptyDockerrc();
     });
 
@@ -85,7 +84,6 @@ suite('Remove Command Tests', async () => {
 
     teardown(async () => {
       await removeMockContainers(mockContainerIds);
-      await clearDockerrc();
       await setEmptyDockerrc();
     });
 
