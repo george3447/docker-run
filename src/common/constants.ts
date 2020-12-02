@@ -1,4 +1,4 @@
-import { AutoAddList, ConfigTargetList } from './models';
+import { AutoAddList, ConfigTargetList, ContainerLabelInfo } from './models';
 
 export const DEFAULT_FILE_NAME = '.dockerrc';
 export const CONFIGURATION_KEY = 'DockerRun';
@@ -34,3 +34,20 @@ export const configTargetList: ConfigTargetList = [
   { label: 'VS Code settings', id: ConfigTarget.Settings, picked: true },
   { label: 'Separate .dockerrc file', id: ConfigTarget.DockerrcFile }
 ];
+
+export const defaultContainerLabelFormat: Array<keyof ContainerLabelInfo> = [
+  'imageName',
+  'imageSeparator',
+  'imageVersion',
+  'emptySpace',
+  'openBracket',
+  'name',
+  'closedBracket'
+];
+
+export const defaultContainerLabelFormatSymbols: Omit<ContainerLabelInfo, 'name' | 'imageName' | 'imageVersion'> = {
+  emptySpace: ' ',
+  imageSeparator: ':',
+  openBracket: '(',
+  closedBracket: ')'
+};

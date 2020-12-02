@@ -13,3 +13,13 @@ export interface ConfigTargetItem extends QuickPickItem {
 }
 
 export type ConfigTargetList = Array<ConfigTargetItem>;
+
+export interface ContainerLabelInfo {
+  emptySpace: string;
+  openBracket: string;
+  closedBracket: string;
+  imageSeparator: string;
+  name: string;
+  imageName: string;
+  imageVersion: string;
+}

@@ -3,7 +3,9 @@ import { QuickPickItem } from 'vscode';
 
 import { ext } from '../core/ext-variables';
 import { getConfig } from './config';
+import { defaultContainerLabelFormat, defaultContainerLabelFormatSymbols } from './constants';
 import { EmptyConfigError, NoContainersFoundError } from './error';
+import { ContainerLabelInfo } from './models';
 
 export interface ContainerListItem extends QuickPickItem {
   containerId: string;
@@ -15,12 +17,16 @@ export function extractContainerIds(containerList: ContainerList) {
   return containerList.map((containerListItem) => containerListItem.containerId);
 }
 
-export async function getWorkspaceContainers(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
+export async function getWorkspaceContainers(
+  isAll: boolean,
+  isRunning?: boolean,
+  labelFormat?: Array<keyof ContainerLabelInfo>
+): Promise<ContainerList> {
   const containers: Array<string> = await getConfig().catch((error: EmptyConfigError) => {
-    error.setFileName('Docker Utils');
+    error.setFileName('list.ts');
     throw error;
   });
-  return await mapContainersWithLabel(containers, isAll, isRunning);
+  return await mapContainersWithLabel(containers, isAll, isRunning, labelFormat);
 }
 
 export async function getGlobalContainers(isAll: boolean, isRunning?: boolean): Promise<ContainerList> {
@@ -46,7 +52,8 @@ export async function isContainerExists(containerId: string): Promise<boolean> {
 async function mapContainersWithLabel(
   containers: string[],
   isAll: boolean,
-  isRunning?: boolean
+  isRunning?: boolean,
+  labelFormat?: Array<keyof ContainerLabelInfo>
 ): Promise<ContainerList> {
   const containersList = [];
   for (let i = 0; i < containers.length; i++) {
@@ -57,7 +64,7 @@ async function mapContainersWithLabel(
       const containerInfo = await container.inspect();
 
       if (isAll || containerInfo.State.Running === isRunning) {
-        const label = getContainerLabel(containerInfo);
+        const label = getContainerLabel(containerInfo, labelFormat);
         containersList.push({ label, containerId });
       }
     }
@@ -65,10 +72,26 @@ async function mapContainersWithLabel(
   return containersList;
 }
 
-function getContainerLabel(containerInfo: ContainerInspectInfo): string {
-  const containerName = getFormattedName(containerInfo.Name);
-  const containerImage = containerInfo.Config.Image;
-  return `${containerImage} (${containerName})`;
+function getContainerLabel(
+  containerInfo: ContainerInspectInfo,
+  labelFormat: Array<keyof ContainerLabelInfo> = defaultContainerLabelFormat
+): string {
+  const {
+    Config: { Image: imageFullName }
+  } = containerInfo;
+
+  const [imageName, imageVersion] = imageFullName.split(':');
+  const name = getFormattedName(containerInfo.Name);
+  const containerLabelInfo: ContainerLabelInfo = {
+    ...defaultContainerLabelFormatSymbols,
+    name,
+    imageName,
+    imageVersion
+  };
+
+  return labelFormat.reduce((label: string, containerLabelInfoKey: keyof ContainerLabelInfo) => {
+    return label + containerLabelInfo[containerLabelInfoKey];
+  }, '');
 }
 
 function getFormattedName(name: string): string {

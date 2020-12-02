@@ -31,10 +31,7 @@ suite('List Tests', async () => {
 
       test('Should throw empty config file error ', async () => {
         fsReadFileStub.resolves('');
-        await assert.rejects(
-          async () => getWorkspaceContainers(true),
-          new EmptyConfigFileError(undefined, 'Docker Utils')
-        );
+        await assert.rejects(async () => getWorkspaceContainers(true), new EmptyConfigFileError(undefined, 'list.ts'));
       });
     });
   }
