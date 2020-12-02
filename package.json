@@ -140,6 +140,7 @@
     "webpack-cli": "~3.3.11"
   },
   "dependencies": {
-    "dockerode": "~3.2.0"
+    "dockerode": "~3.2.0",
+    "vscode-ext-codicons": "~1.2.0"
   }
 }

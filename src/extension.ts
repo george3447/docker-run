@@ -9,12 +9,14 @@ import { disposableStopAll } from './commands/stop-all';
 import { disposableStopNonRelated } from './commands/stop-non-related';
 import { isConfigAvailable } from './common/config';
 import { handleError } from './common/error';
-import { initAutoAdd, initAutoStart, initContainerOperations, initDockerode } from './core/core';
+import { initAutoAdd, initAutoStart, initContainerOperations, initDockerode, initStatusBarItem } from './core/core';
 
 export async function activate(context: ExtensionContext) {
   initDockerode();
 
   initContainerOperations();
+
+  await initStatusBarItem();
 
   context.subscriptions.push(
     disposableAdd,
