@@ -40,7 +40,7 @@ export function getFileUri() {
 
 export function isConfigAvailable() {
   if (isDockerrcDisabled()) {
-    const containers = getConfiguration(CONFIGURATION.CONTAINERS);
+    const containers = getConfiguration<Array<string>>(CONFIGURATION.CONTAINERS);
     return containers !== null;
   }
   return !!getFileUri();
@@ -49,7 +49,7 @@ export function isConfigAvailable() {
 export async function getConfig() {
   let containers;
   if (isDockerrcDisabled()) {
-    containers = getConfiguration(CONFIGURATION.CONTAINERS);
+    containers = getConfiguration<Array<string>>(CONFIGURATION.CONTAINERS);
   } else {
     containers = await getConfigFromDockerrc();
   }
@@ -102,7 +102,6 @@ export async function writeConfigToDockerrc(containerIds: Array<string>) {
     await workspace.fs.writeFile(fileUri, writeData);
   }
 
-  //const fileUri = folderUri.with({ path: posix.join(folderUri.path, DEFAULT_FILE_NAME) });
   const document = await workspace.openTextDocument(fileUri);
   const textEditor = await window.showTextDocument(fileUri);
 

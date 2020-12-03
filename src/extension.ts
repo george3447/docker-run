@@ -9,6 +9,7 @@ import { disposableStopAll } from './commands/stop-all';
 import { disposableStopNonRelated } from './commands/stop-non-related';
 import { isConfigAvailable } from './common/config';
 import { handleError } from './common/error';
+import { clearStatusBarRefreshTimer, disposeStatusBarItem } from './common/status-bar';
 import { initAutoAdd, initAutoStart, initContainerOperations, initDockerode, initStatusBarItem } from './core/core';
 
 export async function activate(context: ExtensionContext) {
@@ -36,5 +37,7 @@ export async function activate(context: ExtensionContext) {
 }
 
 export async function deactivate() {
+  clearStatusBarRefreshTimer();
+  disposeStatusBarItem();
   await commands.executeCommand('docker-run.stop:all');
 }

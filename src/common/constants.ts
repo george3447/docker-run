@@ -8,8 +8,10 @@ export const CONFIGURATION = {
   DISABLE_AUTO_GENERATE_CONFIG: 'DisableAutoGenerateConfig',
   DISABLE_AUTO_STOP_NON_RELATED: 'DisableAutoStopNonRelated',
   DISABLE_DOCKERRC: 'DisableDockerrc',
-  CONTAINERS: 'Containers'
-};
+  CONTAINERS: 'Containers',
+  DISABLE_STATUS_BAR_ITEM: 'DisableStatusBarItem',
+  STATUS_BAR_ITEM_REFRESH_INTERVAL: 'StatusBarItemRefreshInterval'
+} as const;
 
 export enum AutoAdd {
   YES = 1,

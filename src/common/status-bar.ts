@@ -2,7 +2,31 @@ import { StatusBarAlignment, window } from 'vscode';
 import { codicons as codeIcons } from 'vscode-ext-codicons';
 
 import { ext } from '../core/ext-variables';
-import { ContainerListItem, getWorkspaceContainers } from './list';
+import { CONFIGURATION } from './constants';
+import { getWorkspaceContainers } from './list';
+import { getConfiguration } from './settings';
+
+export function initStatusBarItemRefreshTimer() {
+  clearStatusBarRefreshTimer();
+
+  const statusBarItemRefreshInterval = getConfiguration<number>(CONFIGURATION.STATUS_BAR_ITEM_REFRESH_INTERVAL);
+
+  ext.statusBarItemRefreshTimer = setInterval(async () => {
+    await createStatusBarItem(true);
+  }, statusBarItemRefreshInterval || 2000);
+}
+
+export function clearStatusBarRefreshTimer() {
+  if (ext.statusBarItemRefreshTimer) {
+    clearInterval(ext.statusBarItemRefreshTimer);
+  }
+}
+
+export function disposeStatusBarItem() {
+  if (ext.statusBarItem) {
+    ext.statusBarItem.dispose();
+  }
+}
 
 export async function createStatusBarItem(isRefresh = false) {
   if (!ext.statusBarItem) {
@@ -28,16 +52,12 @@ async function getStatusBarItemText() {
 
   const containers = await getWorkspaceContainers(true, false, ['imageName']).catch(() => []);
 
-  const sortedContainers = containers.sort((containerA: ContainerListItem, containerB: ContainerListItem) => {
-    return containerA.label > containerB.label ? 1 : containerA.label < containerB.label ? -1 : 0;
-  });
-
-  for (let index = 0; index < sortedContainers.length; index++) {
+  for (let index = 0; index < containers.length; index++) {
     if (index > 0) {
       statusBartItemText += ' | ';
     }
-    const isRunning = await isContainerRunning(sortedContainers[index].containerId);
-    statusBartItemText += `${isRunning ? codeIcons.play : codeIcons.chrome_maximize} ${sortedContainers[index].label}`;
+    const isRunning = await isContainerRunning(containers[index].containerId);
+    statusBartItemText += `${isRunning ? codeIcons.play : codeIcons.chrome_maximize} ${containers[index].label}`;
   }
   return statusBartItemText;
 }

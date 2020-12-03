@@ -6,7 +6,7 @@ import { AutoAdd, autoAddList, ConfigTarget, configTargetList, CONFIGURATION } f
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import * as messages from '../common/messages';
 import { isSettingsDisabled, updateSettings } from '../common/settings';
-import { createStatusBarItem } from '../common/status-bar';
+import { createStatusBarItem, initStatusBarItemRefreshTimer } from '../common/status-bar';
 import { ext } from './ext-variables';
 import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
 
@@ -21,10 +21,10 @@ export function initContainerOperations() {
 }
 
 export async function initStatusBarItem() {
-  await createStatusBarItem();
-  setInterval(async () => {
-    await createStatusBarItem(true);
-  }, 2000);
+  if (!isSettingsDisabled(CONFIGURATION.DISABLE_STATUS_BAR_ITEM)) {
+    await createStatusBarItem();
+    initStatusBarItemRefreshTimer();
+  }
 }
 
 export async function initAutoAdd() {
