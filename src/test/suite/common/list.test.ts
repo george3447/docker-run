@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { expect } from 'chai';
 import { restore, SinonStub, stub } from 'sinon';
 import { workspace } from 'vscode';
 
@@ -53,7 +54,8 @@ suite('List Tests', async () => {
     test('Should extract list of containerIds from container list', async () => {
       const containersList = await getWorkspaceContainers(true);
       const containerIdsFromContainerList = extractContainerIds(containersList);
-      assert.deepStrictEqual(containerIdsFromContainerList, mockContainerIds);
+      expect(containerIdsFromContainerList).to.have.deep.members(mockContainerIds);
+      assert.strictEqual(containerIdsFromContainerList.length, mockContainerIds.length);
     });
 
     test('Should get list of containers from config', async () => {

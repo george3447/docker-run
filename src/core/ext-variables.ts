@@ -10,4 +10,5 @@ export namespace ext {
   export let stopOperation: StopOperation;
   export let stopNonRelatedOperation: StopNonRelatedOperation;
   export let statusBarItem: StatusBarItem;
+  export let statusBarItemRefreshTimer: NodeJS.Timeout;
 }

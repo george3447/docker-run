@@ -69,7 +69,12 @@ async function mapContainersWithLabel(
       }
     }
   }
-  return containersList;
+
+  const sortedContainers = containersList.sort((containerA: ContainerListItem, containerB: ContainerListItem) => {
+    return containerA.label > containerB.label ? 1 : containerA.label < containerB.label ? -1 : 0;
+  });
+
+  return sortedContainers;
 }
 
 function getContainerLabel(

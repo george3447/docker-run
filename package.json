@@ -66,37 +66,54 @@
           "type": "array",
           "default": [],
           "description": "Container ids to start when workspace open"
+        },
+        "DockerRun.DisableStatusBarItem": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable showing container info in status bar"
+        },
+        "DockerRun.StatusBarItemRefreshInterval": {
+          "type": "number",
+          "default": 2000,
+          "description": "Container status refresh interval (milliseconds)"
         }
       }
     },
     "commands": [
       {
         "command": "docker-run.add",
-        "title": "Docker Run: Add Containers"
+        "title": "Add Containers",
+        "category": "Docker Run"
       },
       {
         "command": "docker-run.remove",
-        "title": "Docker Run: Remove Containers"
+        "title": "Remove Containers",
+        "category": "Docker Run"
       },
       {
         "command": "docker-run.start:all",
-        "title": "Docker Run: Start All Containers"
+        "title": "Start All Containers",
+        "category": "Docker Run"
       },
       {
         "command": "docker-run.stop:all",
-        "title": "Docker Run: Stop All Containers"
+        "title": "Stop All Containers",
+        "category": "Docker Run"
       },
       {
         "command": "docker-run.stop:non-related",
-        "title": "Docker Run: Stop Non Related Containers"
+        "title": "Stop Non Related Containers",
+        "category": "Docker Run"
       },
       {
         "command": "docker-run.start",
-        "title": "Docker Run: Start Containers"
+        "title": "Start Containers",
+        "category": "Docker Run"
       },
       {
         "command": "docker-run.stop",
-        "title": "Docker Run: Stop Containers"
+        "title": "Stop Containers",
+        "category": "Docker Run"
       }
     ]
   },
