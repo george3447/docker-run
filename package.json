@@ -114,6 +114,11 @@
         "command": "docker-run.stop",
         "title": "Stop Containers",
         "category": "Docker Run"
+      },
+      {
+        "command": "docker-run.show-commands",
+        "title": "Show Commands",
+        "category": "Docker Run"
       }
     ]
   },

@@ -1,4 +1,4 @@
-import { ConfigurationTarget, workspace } from 'vscode';
+import { ConfigurationChangeEvent, ConfigurationTarget, workspace } from 'vscode';
 
 import { CONFIGURATION } from './constants';
 
@@ -23,6 +23,13 @@ export function getConfiguration<T>(configurationKey: ConfigurationValue): T | n
 export async function updateSettings(section: string, value: unknown, configurationTarget: ConfigurationTarget) {
   const workspaceConfiguration = getWorkspaceConfiguration();
   await workspaceConfiguration.update(section, value, configurationTarget);
+}
+
+export async function isSettingsChanged(
+  configurationChangeEvent: ConfigurationChangeEvent,
+  configurationKey: ConfigurationValue
+) {
+  return configurationChangeEvent.affectsConfiguration(`${CONFIGURATION.SECTION}.${configurationKey}`);
 }
 
 function getConfigurationDetails(configurationKey: ConfigurationValue) {

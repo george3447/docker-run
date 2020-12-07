@@ -1,12 +1,18 @@
 import * as Dockerode from 'dockerode';
 import { DockerOptions } from 'dockerode';
-import { commands, ConfigurationTarget, window } from 'vscode';
+import { commands, ConfigurationChangeEvent, ConfigurationTarget, window, workspace } from 'vscode';
 
-import { AutoAdd, autoAddList, ConfigTarget, configTargetList, CONFIGURATION } from '../common/constants';
+import { autoAddList, configTargetList, CONFIGURATION } from '../common/constants';
+import { AutoAdd, ConfigTarget } from '../common/enums';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import * as messages from '../common/messages';
-import { isSettingsDisabled, updateSettings } from '../common/settings';
-import { createStatusBarItem, initStatusBarItemRefreshTimer } from '../common/status-bar';
+import { isSettingsChanged, isSettingsDisabled, updateSettings } from '../common/settings';
+import {
+  clearStatusBarRefreshTimer,
+  createStatusBarItem,
+  disposeStatusBarItem,
+  initStatusBarItemRefreshTimer
+} from '../common/status-bar';
 import { ext } from './ext-variables';
 import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
 
@@ -24,6 +30,9 @@ export async function initStatusBarItem() {
   if (!isSettingsDisabled(CONFIGURATION.DISABLE_STATUS_BAR_ITEM)) {
     await createStatusBarItem();
     initStatusBarItemRefreshTimer();
+  } else {
+    clearStatusBarRefreshTimer();
+    disposeStatusBarItem();
   }
 }
 
@@ -76,4 +85,22 @@ export async function initAutoStart() {
   }
 
   await commands.executeCommand('docker-run.stop:non-related');
+}
+
+export async function initOnDidChangeConfiguration() {
+  workspace.onDidChangeConfiguration(async (configurationChangeEvent: ConfigurationChangeEvent) => {
+    const isStatusBarItemIntervalSettingsChanged = isSettingsChanged(
+      configurationChangeEvent,
+      CONFIGURATION.STATUS_BAR_ITEM_REFRESH_INTERVAL
+    );
+
+    const isStatusBarItemDisabledSettingsChanged = isSettingsChanged(
+      configurationChangeEvent,
+      CONFIGURATION.DISABLE_STATUS_BAR_ITEM
+    );
+
+    if (isStatusBarItemIntervalSettingsChanged || isStatusBarItemDisabledSettingsChanged) {
+      await initStatusBarItem();
+    }
+  });
 }

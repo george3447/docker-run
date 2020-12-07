@@ -1,6 +1,6 @@
 import { QuickPickItem } from 'vscode';
 
-import { AutoAdd, ConfigTarget } from './constants';
+import { AutoAdd, ConfigTarget } from './enums';
 
 export interface AutoAddListItem extends QuickPickItem {
   id: AutoAdd;
@@ -23,3 +23,9 @@ export interface ContainerLabelInfo {
   imageName: string;
   imageVersion: string;
 }
+
+export interface DockerRunCommandListItem extends QuickPickItem {
+  id: string;
+}
+
+export type DockerRunCommandList = Array<DockerRunCommandListItem>;

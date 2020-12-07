@@ -9,6 +9,7 @@ export const CONFIGURATION_FILE_NOT_FOUND = `Configuration file not found`;
 export const CONTAINER_ALREADY_RUNNING = (label: string) => `Container ${label} already running`;
 export const DISABLED_AUTO_GENERATE_CONFIG_ERROR = `Disabled auto generate config error`;
 export const DISABLED_AUTO_STOP_NON_RELATED_ERROR = `Disabled auto stop non related error`;
+export const DOCKER_RUN_COMMANDS = `Docker Run commands (pick one)`;
 export const EMPTY_CONFIG_FILE_NAME = (fileName: string) => `Empty config [${fileName}]`;
 export const NO_CONTAINERS_FOUND = `No containers found`;
 export const NO_CONTAINERS_FOUND_FOR_THIS_WORKSPACE = `No containers found for this workspace`;
