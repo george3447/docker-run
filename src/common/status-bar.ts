@@ -25,6 +25,7 @@ export function clearStatusBarRefreshTimer() {
 export function disposeStatusBarItem() {
   if (ext.statusBarItem) {
     ext.statusBarItem.dispose();
+    ext.statusBarItem = null;
   }
 }
 
@@ -38,11 +39,7 @@ export async function createStatusBarItem(isRefresh = false) {
   if (!isRefresh || ext.statusBarItem.text !== statusBartItemText) {
     ext.statusBarItem.text = statusBartItemText;
     ext.statusBarItem.tooltip = 'Click to see docker run commands';
-    ext.statusBarItem.command = {
-      title: 'Show Commands',
-      command: 'workbench.action.quickOpen',
-      arguments: ['> Docker Run:']
-    };
+    ext.statusBarItem.command = 'docker-run.show-commands';
     ext.statusBarItem.show();
   }
 }

@@ -1,4 +1,5 @@
-import { AutoAddList, ConfigTargetList, ContainerLabelInfo } from './models';
+import { AutoAdd, ConfigTarget } from './enums';
+import { AutoAddList, ConfigTargetList, ContainerLabelInfo, DockerRunCommandList } from './models';
 
 export const DEFAULT_FILE_NAME = '.dockerrc';
 export const CONFIGURATION_KEY = 'DockerRun';
@@ -12,18 +13,6 @@ export const CONFIGURATION = {
   DISABLE_STATUS_BAR_ITEM: 'DisableStatusBarItem',
   STATUS_BAR_ITEM_REFRESH_INTERVAL: 'StatusBarItemRefreshInterval'
 } as const;
-
-export enum AutoAdd {
-  YES = 1,
-  No = 2,
-  SKIP_WORK_SPACE = 3,
-  SKIP_GLOBAL = 4
-}
-
-export enum ConfigTarget {
-  Settings = 1,
-  DockerrcFile = 2
-}
 
 export const autoAddList: AutoAddList = [
   { label: 'Yes', id: AutoAdd.YES },
@@ -53,3 +42,40 @@ export const defaultContainerLabelFormatSymbols: Omit<ContainerLabelInfo, 'name'
   openBracket: '(',
   closedBracket: ')'
 };
+
+//TODO: Find a way to get the commands directly from package.json
+export const dockerRunCommands = [
+  {
+    command: 'docker-run.add',
+    title: 'Add Containers'
+  },
+  {
+    command: 'docker-run.remove',
+    title: 'Remove Containers'
+  },
+  {
+    command: 'docker-run.start:all',
+    title: 'Start All Containers'
+  },
+  {
+    command: 'docker-run.stop:all',
+    title: 'Stop All Containers'
+  },
+  {
+    command: 'docker-run.stop:non-related',
+    title: 'Stop Non Related Containers'
+  },
+  {
+    command: 'docker-run.start',
+    title: 'Start Containers'
+  },
+  {
+    command: 'docker-run.stop',
+    title: 'Stop Containers'
+  }
+];
+
+export const dockerRunCommandList: DockerRunCommandList = dockerRunCommands.map(({ command, title }) => ({
+  id: command,
+  label: title
+}));
