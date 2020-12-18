@@ -25,7 +25,7 @@ export async function updateSettings(section: string, value: unknown, configurat
   await workspaceConfiguration.update(section, value, configurationTarget);
 }
 
-export async function isSettingsChanged(
+export function isSettingsChanged(
   configurationChangeEvent: ConfigurationChangeEvent,
   configurationKey: ConfigurationValue
 ) {

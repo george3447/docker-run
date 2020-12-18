@@ -1,6 +1,12 @@
-import { ConfigurationTarget } from 'vscode';
+import { ConfigurationTarget, Uri } from 'vscode';
 
-import { isDockerrcDisabled as isDockerrcConfigDisabled, writeConfigToDockerrc } from '../../common/config';
+import {
+  createConfigFile,
+  getConfigFileDestination,
+  isDockerrcDisabled as isDockerrcConfigDisabled,
+  removeDockerrc,
+  writeConfigToDockerrc
+} from '../../common/config';
 import { CONFIGURATION } from '../../common/constants';
 import { updateSettings } from '../../common/settings';
 
@@ -14,4 +20,12 @@ export const setEmptyDockerrc = async () => {
     return;
   }
   await writeConfigToDockerrc([]);
+};
+
+export const createDockerrcFile = async () => {
+  await createConfigFile('', getConfigFileDestination() as Uri);
+};
+
+export const removeDockerrcFile = async () => {
+  await removeDockerrc();
 };

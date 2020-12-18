@@ -2,11 +2,12 @@ import * as Dockerode from 'dockerode';
 import { DockerOptions } from 'dockerode';
 import { commands, ConfigurationChangeEvent, ConfigurationTarget, window, workspace } from 'vscode';
 
+import { moveToDockerrc, moveToSettings } from '../common/config';
 import { autoAddList, configTargetList, CONFIGURATION } from '../common/constants';
 import { AutoAdd, ConfigTarget } from '../common/enums';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import * as messages from '../common/messages';
-import { isSettingsChanged, isSettingsDisabled, updateSettings } from '../common/settings';
+import { getConfiguration, isSettingsChanged, isSettingsDisabled, updateSettings } from '../common/settings';
 import {
   clearStatusBarRefreshTimer,
   createStatusBarItem,
@@ -99,8 +100,20 @@ export async function initOnDidChangeConfiguration() {
       CONFIGURATION.DISABLE_STATUS_BAR_ITEM
     );
 
+    const isDisableDockerrcSettingsChanged = isSettingsChanged(
+      configurationChangeEvent,
+      CONFIGURATION.DISABLE_DOCKERRC
+    );
+
     if (isStatusBarItemIntervalSettingsChanged || isStatusBarItemDisabledSettingsChanged) {
       await initStatusBarItem();
+    } else if (isDisableDockerrcSettingsChanged) {
+      const isDockerrcDisabled = getConfiguration<boolean>(CONFIGURATION.DISABLE_DOCKERRC);
+      if (isDockerrcDisabled) {
+        await moveToSettings();
+      } else {
+        await moveToDockerrc();
+      }
     }
   });
 }
