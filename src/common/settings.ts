@@ -25,11 +25,10 @@ export async function updateSettings(section: string, value: unknown, configurat
   await workspaceConfiguration.update(section, value, configurationTarget);
 }
 
-export function isSettingsChanged(
-  configurationChangeEvent: ConfigurationChangeEvent,
-  configurationKey: ConfigurationValue
-) {
-  return configurationChangeEvent.affectsConfiguration(`${CONFIGURATION.SECTION}.${configurationKey}`);
+export function settingsChanged(configurationChangeEvent: ConfigurationChangeEvent) {
+  return (configurationKey: ConfigurationValue) => {
+    return configurationChangeEvent.affectsConfiguration(`${CONFIGURATION.SECTION}.${configurationKey}`);
+  };
 }
 
 function getConfigurationDetails(configurationKey: ConfigurationValue) {

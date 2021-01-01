@@ -8,7 +8,7 @@ import { ext } from '../ext-variables';
 export abstract class Operation {
   abstract getProgressTitleForSingleContainer(label: string): string;
   abstract getProgressTitleForMultipleContainers(isAll?: boolean): string;
-  abstract async operate(container: Container, label?: string): Promise<void>;
+  abstract operate(container: Container, label?: string): Promise<void>;
 
   async operateContainers(selection: ContainerList, isAll = false) {
     const progressOptions: ProgressOptions = { location: ProgressLocation.Notification };

@@ -18,7 +18,6 @@ export const NO_CONTAINER_WITH_CONTAINER_ID_FOUND = (containerId: string) =>
 export const NO_DEFAULT_FILE_NAME_PROVIDED = (DEFAULT_FILE_NAME: string) => `No ${DEFAULT_FILE_NAME} provided`;
 export const NO_FOLDER_OR_WORKSPACE_OPENED = `No folder or workspace opened`;
 export const NO_NON_RELATED_CONTAINER_FOUND = `No non related container found`;
-export const NO_RUNNING_CONTAINERS_FOUND = `No running containers found`;
 export const SELECT_AT_LEAST_ONE_CONTAINER_TO_ADD = `Please select at least one container to add`;
 export const SELECT_AT_LEAST_ONE_CONTAINER_TO_REMOVE = `Please select at least one container to remove`;
 export const SELECT_AT_LEAST_ONE_CONTAINER_TO_START = `Please select at least one container to start`;

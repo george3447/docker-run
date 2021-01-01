@@ -1,13 +1,8 @@
 import { ConfigurationTarget, Uri } from 'vscode';
 
-import {
-  createConfigFile,
-  getConfigFileDestination,
-  isDockerrcDisabled as isDockerrcConfigDisabled,
-  removeDockerrc,
-  writeConfigToDockerrc
-} from '../../common/config';
+import { isDockerrcDisabled as isDockerrcConfigDisabled } from '../../common/config';
 import { CONFIGURATION } from '../../common/constants';
+import { createConfigFile, getConfigFileDestination, removeDockerrc, writeConfigToDockerrc } from '../../common/file';
 import { updateSettings } from '../../common/settings';
 
 export const isDockerrcDisabled = () => {

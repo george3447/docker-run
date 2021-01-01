@@ -43,35 +43,45 @@ export const defaultContainerLabelFormatSymbols: Omit<ContainerLabelInfo, 'name'
   closedBracket: ')'
 };
 
+export const COMMANDS = {
+  ADD: 'docker-run.add',
+  REMOVE: 'docker-run.remove',
+  START: 'docker-run.start',
+  START_ALL: 'docker-run.start:all',
+  STOP: 'docker-run.stop',
+  STOP_ALL: 'docker-run.stop:all',
+  STOP_NON_RELATED: 'docker-run.stop:non-related'
+};
+
 //TODO: Find a way to get the commands directly from package.json
 export const dockerRunCommands = [
   {
-    command: 'docker-run.add',
+    command: COMMANDS.ADD,
     title: 'Add Containers'
   },
   {
-    command: 'docker-run.remove',
+    command: COMMANDS.REMOVE,
     title: 'Remove Containers'
   },
   {
-    command: 'docker-run.start:all',
-    title: 'Start All Containers'
-  },
-  {
-    command: 'docker-run.stop:all',
-    title: 'Stop All Containers'
-  },
-  {
-    command: 'docker-run.stop:non-related',
-    title: 'Stop Non Related Containers'
-  },
-  {
-    command: 'docker-run.start',
+    command: COMMANDS.START,
     title: 'Start Containers'
   },
   {
-    command: 'docker-run.stop',
+    command: COMMANDS.START_ALL,
+    title: 'Start All Containers'
+  },
+  {
+    command: COMMANDS.STOP,
     title: 'Stop Containers'
+  },
+  {
+    command: COMMANDS.STOP_ALL,
+    title: 'Stop All Containers'
+  },
+  {
+    command: COMMANDS.STOP_NON_RELATED,
+    title: 'Stop Non Related Containers'
   }
 ];
 

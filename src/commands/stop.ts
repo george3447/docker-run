@@ -21,11 +21,6 @@ export const disposableStop = commands.registerCommand('docker-run.stop', async 
     return;
   }
 
-  if (!runningContainerList.length) {
-    window.showInformationMessage(messages.NO_RUNNING_CONTAINERS_FOUND);
-    return;
-  }
-
   const selection = await window.showQuickPick(runningContainerList, {
     canPickMany: true,
     placeHolder: 'Select Container'

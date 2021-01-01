@@ -11,7 +11,7 @@ export const disposableStopNonRelated = commands.registerCommand('docker-run.sto
     return [] as ContainerList;
   });
 
-  const allContainers = await getGlobalContainers(true).catch((error: Error) => {
+  const allContainers = await getGlobalContainers(false, true).catch((error: Error) => {
     handleError(error);
     return [] as ContainerList;
   });

@@ -7,7 +7,7 @@ import { autoAddList, configTargetList, CONFIGURATION } from '../common/constant
 import { AutoAdd, ConfigTarget } from '../common/enums';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import * as messages from '../common/messages';
-import { getConfiguration, isSettingsChanged, isSettingsDisabled, updateSettings } from '../common/settings';
+import { getConfiguration, isSettingsDisabled, settingsChanged, updateSettings } from '../common/settings';
 import {
   clearStatusBarRefreshTimer,
   createStatusBarItem,
@@ -90,29 +90,21 @@ export async function initAutoStart() {
 
 export async function initOnDidChangeConfiguration() {
   workspace.onDidChangeConfiguration(async (configurationChangeEvent: ConfigurationChangeEvent) => {
-    const isStatusBarItemIntervalSettingsChanged = isSettingsChanged(
-      configurationChangeEvent,
-      CONFIGURATION.STATUS_BAR_ITEM_REFRESH_INTERVAL
-    );
+    const isSettingsChanged = settingsChanged(configurationChangeEvent);
 
-    const isStatusBarItemDisabledSettingsChanged = isSettingsChanged(
-      configurationChangeEvent,
-      CONFIGURATION.DISABLE_STATUS_BAR_ITEM
-    );
-
-    const isDisableDockerrcSettingsChanged = isSettingsChanged(
-      configurationChangeEvent,
-      CONFIGURATION.DISABLE_DOCKERRC
-    );
-
-    if (isStatusBarItemIntervalSettingsChanged || isStatusBarItemDisabledSettingsChanged) {
-      await initStatusBarItem();
-    } else if (isDisableDockerrcSettingsChanged) {
-      const isDockerrcDisabled = getConfiguration<boolean>(CONFIGURATION.DISABLE_DOCKERRC);
-      if (isDockerrcDisabled) {
-        await moveToSettings();
-      } else {
-        await moveToDockerrc();
+    switch (true) {
+      case isSettingsChanged(CONFIGURATION.STATUS_BAR_ITEM_REFRESH_INTERVAL):
+      case isSettingsChanged(CONFIGURATION.DISABLE_STATUS_BAR_ITEM):
+        await initStatusBarItem();
+        break;
+      case isSettingsChanged(CONFIGURATION.DISABLE_DOCKERRC): {
+        const isDockerrcDisabled = getConfiguration<boolean>(CONFIGURATION.DISABLE_DOCKERRC);
+        if (isDockerrcDisabled) {
+          await moveToSettings();
+        } else {
+          await moveToDockerrc();
+        }
+        break;
       }
     }
   });
