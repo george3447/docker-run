@@ -9,6 +9,7 @@ export const CONFIGURATION_FILE_NOT_FOUND = `Configuration file not found`;
 export const CONTAINER_ALREADY_RUNNING = (label: string) => `Container ${label} already running`;
 export const DISABLED_AUTO_GENERATE_CONFIG_ERROR = `Disabled auto generate config error`;
 export const DISABLED_AUTO_STOP_NON_RELATED_ERROR = `Disabled auto stop non related error`;
+export const DOCKER_RUN_COMMANDS = `Docker Run commands (pick one)`;
 export const EMPTY_CONFIG_FILE_NAME = (fileName: string) => `Empty config [${fileName}]`;
 export const NO_CONTAINERS_FOUND = `No containers found`;
 export const NO_CONTAINERS_FOUND_FOR_THIS_WORKSPACE = `No containers found for this workspace`;
@@ -17,7 +18,6 @@ export const NO_CONTAINER_WITH_CONTAINER_ID_FOUND = (containerId: string) =>
 export const NO_DEFAULT_FILE_NAME_PROVIDED = (DEFAULT_FILE_NAME: string) => `No ${DEFAULT_FILE_NAME} provided`;
 export const NO_FOLDER_OR_WORKSPACE_OPENED = `No folder or workspace opened`;
 export const NO_NON_RELATED_CONTAINER_FOUND = `No non related container found`;
-export const NO_RUNNING_CONTAINERS_FOUND = `No running containers found`;
 export const SELECT_AT_LEAST_ONE_CONTAINER_TO_ADD = `Please select at least one container to add`;
 export const SELECT_AT_LEAST_ONE_CONTAINER_TO_REMOVE = `Please select at least one container to remove`;
 export const SELECT_AT_LEAST_ONE_CONTAINER_TO_START = `Please select at least one container to start`;

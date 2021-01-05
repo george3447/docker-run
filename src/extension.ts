@@ -2,6 +2,7 @@ import { commands, ExtensionContext } from 'vscode';
 
 import { disposableAdd } from './commands/add';
 import { disposableRemove } from './commands/remove';
+import { disposableShowCommand } from './commands/show-commands';
 import { disposableStart } from './commands/start';
 import { disposableStartAll } from './commands/start-all';
 import { disposableStop } from './commands/stop';
@@ -9,12 +10,24 @@ import { disposableStopAll } from './commands/stop-all';
 import { disposableStopNonRelated } from './commands/stop-non-related';
 import { isConfigAvailable } from './common/config';
 import { handleError } from './common/error';
-import { initAutoAdd, initAutoStart, initContainerOperations, initDockerode } from './core/core';
+import { clearStatusBarRefreshTimer, disposeStatusBarItem } from './common/status-bar';
+import {
+  initAutoAdd,
+  initAutoStart,
+  initContainerOperations,
+  initDockerode,
+  initOnDidChangeConfiguration,
+  initStatusBarItem
+} from './core/core';
 
 export async function activate(context: ExtensionContext) {
   initDockerode();
 
   initContainerOperations();
+
+  await initStatusBarItem();
+
+  initOnDidChangeConfiguration();
 
   context.subscriptions.push(
     disposableAdd,
@@ -23,7 +36,8 @@ export async function activate(context: ExtensionContext) {
     disposableStopAll,
     disposableStopNonRelated,
     disposableStart,
-    disposableStop
+    disposableStop,
+    disposableShowCommand
   );
 
   if (!isConfigAvailable()) {
@@ -34,5 +48,7 @@ export async function activate(context: ExtensionContext) {
 }
 
 export async function deactivate() {
+  clearStatusBarRefreshTimer();
+  disposeStatusBarItem();
   await commands.executeCommand('docker-run.stop:all');
 }

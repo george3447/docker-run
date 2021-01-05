@@ -1,11 +1,19 @@
 import * as Dockerode from 'dockerode';
 import { DockerOptions } from 'dockerode';
-import { commands, ConfigurationTarget, window } from 'vscode';
+import { commands, ConfigurationChangeEvent, ConfigurationTarget, window, workspace } from 'vscode';
 
-import { AutoAdd, autoAddList, ConfigTarget, configTargetList, CONFIGURATION } from '../common/constants';
+import { moveToDockerrc, moveToSettings } from '../common/config';
+import { autoAddList, configTargetList, CONFIGURATION } from '../common/constants';
+import { AutoAdd, ConfigTarget } from '../common/enums';
 import { AutoGenerateConfigDisabledError, AutoStopNonRelatedDisabledError } from '../common/error';
 import * as messages from '../common/messages';
-import { isSettingsDisabled, updateSettings } from '../common/settings';
+import { getConfiguration, isSettingsDisabled, settingsChanged, updateSettings } from '../common/settings';
+import {
+  clearStatusBarRefreshTimer,
+  createStatusBarItem,
+  disposeStatusBarItem,
+  initStatusBarItemRefreshTimer
+} from '../common/status-bar';
 import { ext } from './ext-variables';
 import { StartOperation, StopNonRelatedOperation, StopOperation } from './operations';
 
@@ -17,6 +25,16 @@ export function initContainerOperations() {
   ext.startOperation = new StartOperation();
   ext.stopOperation = new StopOperation();
   ext.stopNonRelatedOperation = new StopNonRelatedOperation();
+}
+
+export async function initStatusBarItem() {
+  if (!isSettingsDisabled(CONFIGURATION.DISABLE_STATUS_BAR_ITEM)) {
+    await createStatusBarItem();
+    initStatusBarItemRefreshTimer();
+  } else {
+    clearStatusBarRefreshTimer();
+    disposeStatusBarItem();
+  }
 }
 
 export async function initAutoAdd() {
@@ -68,4 +86,26 @@ export async function initAutoStart() {
   }
 
   await commands.executeCommand('docker-run.stop:non-related');
+}
+
+export async function initOnDidChangeConfiguration() {
+  workspace.onDidChangeConfiguration(async (configurationChangeEvent: ConfigurationChangeEvent) => {
+    const isSettingsChanged = settingsChanged(configurationChangeEvent);
+
+    switch (true) {
+      case isSettingsChanged(CONFIGURATION.STATUS_BAR_ITEM_REFRESH_INTERVAL):
+      case isSettingsChanged(CONFIGURATION.DISABLE_STATUS_BAR_ITEM):
+        await initStatusBarItem();
+        break;
+      case isSettingsChanged(CONFIGURATION.DISABLE_DOCKERRC): {
+        const isDockerrcDisabled = getConfiguration<boolean>(CONFIGURATION.DISABLE_DOCKERRC);
+        if (isDockerrcDisabled) {
+          await moveToSettings();
+        } else {
+          await moveToDockerrc();
+        }
+        break;
+      }
+    }
+  });
 }

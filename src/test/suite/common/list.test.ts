@@ -1,12 +1,11 @@
 import * as assert from 'assert';
-import { restore, SinonStub, stub } from 'sinon';
-import { workspace } from 'vscode';
+import { expect } from 'chai';
 
 import { writeConfig } from '../../../common/config';
 import { EmptyConfigFileError, NoContainersFoundError } from '../../../common/error';
 import { extractContainerIds, getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
 import { ext } from '../../../core/ext-variables';
-import { isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
+import { createDockerrcFile, isDockerrcDisabled, removeDockerrcFile, setEmptyDockerrc } from '../../utils/common';
 import {
   getMockContainer,
   getMockContainerIds,
@@ -19,22 +18,17 @@ let mockContainerIds: Array<string> = [];
 suite('List Tests', async () => {
   if (!isDockerrcDisabled()) {
     suite('With dockerrc file', async () => {
-      let fsReadFileStub: SinonStub;
-
       setup(async () => {
-        fsReadFileStub = stub(workspace.fs, 'readFile');
+        await removeDockerrcFile();
+        await createDockerrcFile();
       });
 
       teardown(async () => {
-        restore();
+        await removeDockerrcFile();
       });
 
       test('Should throw empty config file error ', async () => {
-        fsReadFileStub.resolves('');
-        await assert.rejects(
-          async () => getWorkspaceContainers(true),
-          new EmptyConfigFileError(undefined, 'Docker Utils')
-        );
+        await assert.rejects(async () => getWorkspaceContainers(true), new EmptyConfigFileError(undefined, 'list.ts'));
       });
     });
   }
@@ -56,7 +50,8 @@ suite('List Tests', async () => {
     test('Should extract list of containerIds from container list', async () => {
       const containersList = await getWorkspaceContainers(true);
       const containerIdsFromContainerList = extractContainerIds(containersList);
-      assert.deepStrictEqual(containerIdsFromContainerList, mockContainerIds);
+      expect(containerIdsFromContainerList).to.have.deep.members(mockContainerIds);
+      assert.strictEqual(containerIdsFromContainerList.length, mockContainerIds.length);
     });
 
     test('Should get list of containers from config', async () => {
