@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import { extensions } from 'vscode';
 
-import { getConfig, writeConfig } from '../../../common/config';
-import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../../common/error';
+import { getConfig, writeConfig } from '../../../src/common/config';
+import { DockerrcNotFoundError, EmptyConfigArrayError, EmptyConfigFileError } from '../../../src/common/error';
 import { createDockerrcFile, isDockerrcDisabled, removeDockerrcFile, setEmptyDockerrc } from '../../utils/common';
 
 const mockContainerIds = ['asd123asd123', '123asd123asd123asd'];

@@ -20,7 +20,7 @@
       "label": "pretest",
       "type": "shell",
       "command": "npx",
-      "args": ["npe", "main", "./out/extension"]
+      "args": ["npe", "main", "./out/src/extension"]
     },
     {
       "label": "test-compile",

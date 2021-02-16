@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import { expect } from 'chai';
 
-import { writeConfig } from '../../../common/config';
-import { EmptyConfigFileError, NoContainersFoundError } from '../../../common/error';
-import { extractContainerIds, getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
-import { ext } from '../../../core/ext-variables';
+import { writeConfig } from '../../../src/common/config';
+import { EmptyConfigFileError, NoContainersFoundError } from '../../../src/common/error';
+import { extractContainerIds, getGlobalContainers, getWorkspaceContainers } from '../../../src/common/list';
+import { ext } from '../../../src/core/ext-variables';
 import { createDockerrcFile, isDockerrcDisabled, removeDockerrcFile, setEmptyDockerrc } from '../../utils/common';
 import {
   getMockContainer,

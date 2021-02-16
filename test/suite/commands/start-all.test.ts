@@ -2,11 +2,11 @@ import { assert, expect } from 'chai';
 import { restore, SinonSpy, spy } from 'sinon';
 import { commands, window } from 'vscode';
 
-import { writeConfig } from '../../../common/config';
-import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
-import * as messages from '../../../common/messages';
-import { ext } from '../../../core/ext-variables';
-import { StartOperation } from '../../../core/operations';
+import { writeConfig } from '../../../src/common/config';
+import { getGlobalContainers, getWorkspaceContainers } from '../../../src/common/list';
+import * as messages from '../../../src/common/messages';
+import { ext } from '../../../src/core/ext-variables';
+import { StartOperation } from '../../../src/core/operations';
 import { setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 

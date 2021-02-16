@@ -1,4 +1,4 @@
-import { ext } from '../../core/ext-variables';
+import { ext } from '../../src/core/ext-variables';
 
 export const testImage = 'm4rcu5/lighttpd:latest';
 

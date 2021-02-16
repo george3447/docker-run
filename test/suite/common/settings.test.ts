@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import { ConfigurationTarget } from 'vscode';
 
-import { CONFIGURATION } from '../../../common/constants';
-import { isSettingsDisabled, updateSettings } from '../../../common/settings';
+import { CONFIGURATION } from '../../../src/common/constants';
+import { isSettingsDisabled, updateSettings } from '../../../src/common/settings';
 
 suite('Settings Tests', async () => {
   test('Should return auto generate config disabled false by default', async () => {

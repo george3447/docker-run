@@ -23,7 +23,7 @@
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
         "--launchArgs",
-        "${workspaceFolder}/src/test/workspace-v1",
+        "${workspaceFolder}/test/workspace-v1",
         "--disable-extensions"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
@@ -39,7 +39,7 @@
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
         "--launchArgs",
-        "${workspaceFolder}/src/test/workspace",
+        "${workspaceFolder}/test/workspace",
         "--disable-extensions"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],

@@ -1,7 +1,7 @@
 import { SinonStub, stub } from 'sinon';
 
-import { initDockerode } from '../../core/core';
-import { ext } from '../../core/ext-variables';
+import { initDockerode } from '../../src/core/core';
+import { ext } from '../../src/core/ext-variables';
 import { testImage } from '../utils/container';
 
 let stubConsoleWarn: SinonStub;

@@ -2,22 +2,22 @@ import { assert, expect } from 'chai';
 import { SinonSpy, spy } from 'sinon';
 import { window } from 'vscode';
 
-import { writeConfig } from '../../../common/config';
-import { getGlobalContainers, getWorkspaceContainers } from '../../../common/list';
-import * as messages from '../../../common/messages';
-import { ext } from '../../../core/ext-variables';
-import { StopNonRelatedOperation } from '../../../core/operations';
+import { writeConfig } from '../../../src/common/config';
+import { getGlobalContainers, getWorkspaceContainers } from '../../../src/common/list';
+import * as messages from '../../../src/common/messages';
+import { ext } from '../../../src/core/ext-variables';
+import { StopOperation } from '../../../src/core/operations';
 import { setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 
 let mockContainerIds: Array<string> = [];
 
-suite('Stop Non Related Operation Tests', async () => {
+suite('Stop Operation Tests', async () => {
   let spyShowInformationMessage: SinonSpy;
   let spyWithProgress: SinonSpy;
 
   suiteSetup(async () => {
-    ext.stopNonRelatedOperation = new StopNonRelatedOperation();
+    ext.stopOperation = new StopOperation();
   });
 
   setup(async () => {
@@ -43,9 +43,9 @@ suite('Stop Non Related Operation Tests', async () => {
     test('Should stop the container', async () => {
       const mockContainersList = await getWorkspaceContainers(true);
       await ext.dockerode.getContainer(mockContainersList[0].containerId).start();
-      await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
+      await ext.stopOperation.operateContainers(mockContainersList);
 
-      const mockMessage = messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(mockContainersList[0].label);
+      const mockMessage = messages.SUCCESSFULLY_STOPPED_CONTAINER(mockContainersList[0].label);
       const spyShowInformationMessageArgs = spyShowInformationMessage.getCall(0).args[0];
       const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -57,7 +57,7 @@ suite('Stop Non Related Operation Tests', async () => {
 
     test('Should show only progress, if container already stopped', async () => {
       const mockContainersList = await getWorkspaceContainers(true);
-      await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
+      await ext.stopOperation.operateContainers(mockContainersList);
 
       const stoppedContainers = await getGlobalContainers(false, false);
       assert.ok(spyWithProgress.calledOnce);
@@ -70,7 +70,7 @@ suite('Stop Non Related Operation Tests', async () => {
         ...mockContainer,
         containerId: mockContainer.containerId + index
       }));
-      await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
+      await ext.stopOperation.operateContainers(mockContainersList);
 
       const mockMessage = messages.NO_CONTAINER_WITH_CONTAINER_ID_FOUND(mockContainersList[0].containerId);
       const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
@@ -95,11 +95,9 @@ suite('Stop Non Related Operation Tests', async () => {
     test('Should stop all containers', async () => {
       const mockContainersList = await getWorkspaceContainers(true);
       await Promise.all(mockContainerIds.map((mockContainerId) => ext.dockerode.getContainer(mockContainerId).start()));
-      await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
+      await ext.stopOperation.operateContainers(mockContainersList);
 
-      const mockMessages = mockContainersList.map(({ label }) =>
-        messages.SUCCESSFULLY_STOPPED_NON_RELATED_CONTAINER(label)
-      );
+      const mockMessages = mockContainersList.map(({ label }) => messages.SUCCESSFULLY_STOPPED_CONTAINER(label));
       const spyShowInformationMessageArgs = spyShowInformationMessage.getCalls().map(({ args }) => args[0]);
       const stoppedContainers = await getGlobalContainers(false, false);
 
@@ -111,7 +109,7 @@ suite('Stop Non Related Operation Tests', async () => {
 
     test('Should show only progress, if containers already stopped', async () => {
       const mockContainersList = await getWorkspaceContainers(true);
-      await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
+      await ext.stopOperation.operateContainers(mockContainersList);
 
       const stoppedContainers = await getGlobalContainers(false, false);
       assert.ok(spyWithProgress.calledOnce);
@@ -124,7 +122,7 @@ suite('Stop Non Related Operation Tests', async () => {
         ...mockContainer,
         containerId: mockContainer.containerId + index
       }));
-      await ext.stopNonRelatedOperation.operateContainers(mockContainersList);
+      await ext.stopOperation.operateContainers(mockContainersList);
 
       const mockMessages = mockContainersList.map(({ containerId }) =>
         messages.NO_CONTAINER_WITH_CONTAINER_ID_FOUND(containerId)
