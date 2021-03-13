@@ -36,7 +36,7 @@ suite('Add Command Tests', async () => {
   suite('With No Available Container', async () => {
     test('Should show no container found message', async () => {
       await commands.executeCommand('docker-run.add');
-      const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
+      const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(2).args[0];
 
       assert.strictEqual(messages.NO_CONTAINERS_FOUND, spyShowWarningMessageArgs);
     });
