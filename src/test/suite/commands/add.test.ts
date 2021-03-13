@@ -7,7 +7,7 @@ import { ContainerList } from '../../../common/list';
 import * as messages from '../../../common/messages';
 import { ext } from '../../../core/ext-variables';
 import { StartOperation } from '../../../core/operations';
-import { setEmptyDockerrc } from '../../utils/common';
+import { isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 
 let mockContainerIds: Array<string> = [];
@@ -36,7 +36,8 @@ suite('Add Command Tests', async () => {
   suite('With No Available Container', async () => {
     test('Should show no container found message', async () => {
       await commands.executeCommand('docker-run.add');
-      const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(0).args[0];
+      const callIndex = isDockerrcDisabled() ? 2 : 0;
+      const spyShowWarningMessageArgs = spyShowWarningMessage.getCall(callIndex).args[0];
 
       assert.strictEqual(messages.NO_CONTAINERS_FOUND, spyShowWarningMessageArgs);
     });
