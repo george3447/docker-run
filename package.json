@@ -33,7 +33,7 @@
     "url": "https://github.com/george3447/docker-run/issues"
   },
   "activationEvents": [
-    "workspaceContains:*",
+    "onStartupFinished",
     "onCommand:docker-run.add",
     "onCommand:docker-run.remove",
     "onCommand:docker-run.start:all",
