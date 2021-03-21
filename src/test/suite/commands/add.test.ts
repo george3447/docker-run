@@ -7,7 +7,7 @@ import { ContainerList } from '../../../common/list';
 import * as messages from '../../../common/messages';
 import { ext } from '../../../core/ext-variables';
 import { StartOperation } from '../../../core/operations';
-import { isDockerrcDisabled, setEmptyDockerrc } from '../../utils/common';
+import { setEmptyDockerrc } from '../../utils/common';
 import { getMockContainerIds, removeMockContainers } from '../../utils/container';
 
 let mockContainerIds: Array<string> = [];
