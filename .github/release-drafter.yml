@@ -22,6 +22,5 @@ categories:
 exclude-labels:
   - 'skip-changelog'
 template: |
-  ## Changes
 
   $CHANGES
