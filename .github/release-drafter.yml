@@ -1,4 +1,27 @@
+name-template: "v$RESOLVED_VERSION 🌈"
+tag-template: "v$RESOLVED_VERSION"
+categories:
+  - title: "📦 New Feature"
+    labels:
+      - "📦 NEW"
+      - "Feature"
+
+  - title: "👌 Improvements"
+    labels:
+      - "👌 IMPROVE"
+
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "🐛 FIX"
+      - "Fix"
+      - "bugfix"
+      - "bug"
+  - title: "Dependency Updates"
+    labels:
+      - "Bump"
+exclude-labels:
+  - 'skip-changelog'
 template: |
-  ## What’s Changed
+  ## Changes
 
   $CHANGES
