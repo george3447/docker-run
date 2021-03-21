@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - '**'
+    paths-ignore:
+      - '.github/workflows/release-drafter.yml'
+      - '.github/release-drafter.yml'
+      - 'README.md'
   release:
     types:
       - created
