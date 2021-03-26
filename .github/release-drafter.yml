@@ -5,16 +5,15 @@ template: |
 categories:
   - title: "📦 New Feature"
     labels:
-      - "NEW"
-      - "Feature"
-  - title: "Improvements"
+      - "enhancement"
+  - title: "👌 Improvements"
     labels:
-      - "IMPROVE"
-  - title: "Bug Fixes"
+      - "improvement"
+  - title: "🐛 Bug Fixes"
     labels:
-      - "FIX"
+      - "bug"
   - title: "Dependency Updates"
     labels:
-      - "Bump"
+      - "dependencies"
 exclude-labels:
-  - "skip-changelog"
+  - "skip change log"
