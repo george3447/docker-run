@@ -3,17 +3,16 @@ tag-template: "v$RESOLVED_VERSION"
 template: |
   $CHANGES
 categories:
-  - title: "📦 New Feature"
+  - title: "📦 New Features"
     labels:
       - "enhancement"
-  - title: "👌 Improvements"
-    labels:
       - "improvement"
   - title: "🐛 Bug Fixes"
     labels:
       - "bug"
-  - title: "Dependency Updates"
+  - title: "✨ Dependency Updates"
     labels:
       - "dependencies"
 exclude-labels:
   - "skip change log"
+
