@@ -2,7 +2,7 @@
   "name": "docker-run",
   "displayName": "Docker Run",
   "description": "Start your docker containers automatically for each workspace",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "icon": "images/icon.png",
   "author": {
     "name": "Georgekutty Antony",
