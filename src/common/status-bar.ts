@@ -47,7 +47,13 @@ export async function createStatusBarItem(isRefresh = false) {
 async function getStatusBarItemText() {
   let statusBartItemText = '';
 
-  const containers = await getWorkspaceContainers(true, false, ['imageName']).catch(() => []);
+  const containers = await getWorkspaceContainers(true, false, [
+    'imageName',
+    'emptySpace',
+    'imageSeparator',
+    'emptySpace',
+    'name'
+  ]).catch(() => []);
 
   for (let index = 0; index < containers.length; index++) {
     if (index > 0) {
