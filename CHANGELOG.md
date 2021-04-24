@@ -25,5 +25,5 @@
 - Auto run docker container based on dockerrc
 - Start all and stop all commands
 - Settings based auto start
-- Command for stopping non related containers
+- Command for stopping non-related containers
 - Add, remove, start and stop commands
