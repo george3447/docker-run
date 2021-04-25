@@ -26,4 +26,5 @@ jobs:
         #   config-name: my-config.yml
         #   disable-autolabeler: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # https://twitter.com/GeertvdC/status/1183837353493893122
+          GITHUB_TOKEN: ${{ secrets.RELEASE_DRAFTER_TOKEN }}
